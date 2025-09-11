@@ -1,0 +1,265 @@
+import { useAuthContext } from '@/auth/hooks/useAuthContext';
+import { PageLoading } from '@/components/PageLoading';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Navigation } from '@/components/ui/navigation';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Plan, useCreateOrderPayme } from '@/modules/plan';
+import { useCreateOrderClick } from '@/modules/plan/hooks/usePlans';
+import { useGetPlans } from '@/services/planQueries';
+import { Check, Crown, Star, CreditCard, Smartphone } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Click, Payme } from '@/assets/Payme';
+
+const Pricing = () => {
+  const { data, isLoading } = useGetPlans();
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  const { mutate: createOrder, isPending, variables } = useCreateOrderPayme();
+  const {
+    mutate: createOrderClick,
+    isPending: isPendingClick,
+    variables: variablesClick,
+  } = useCreateOrderClick();
+
+  const firstPlan = data?.[0];
+
+  if (isLoading) return <PageLoading />;
+
+  if (!firstPlan) return null;
+
+  const handleGetPremium = (plan: Plan) => {
+    if (!user) {
+      navigate('/auth/login');
+      return;
+    }
+    setSelectedPlan(plan);
+    setIsPaymentDialogOpen(true);
+  };
+
+  const handlePaymePayment = () => {
+    if (selectedPlan) {
+      createOrder(selectedPlan._id);
+      setIsPaymentDialogOpen(false);
+    }
+  };
+
+  const handleClickPayment = () => {
+    if (selectedPlan) {
+      createOrderClick(selectedPlan._id);
+      setIsPaymentDialogOpen(false);
+    }
+  };
+
+  const plans = [
+    {
+      name: 'Freemium',
+      price: 'Free',
+      period: '',
+      description: 'Perfect for trying out our service',
+      icon: <Star className="h-6 w-6" />,
+      features: [
+        '1 free essay check',
+        'Band score estimation',
+        'Band 7 improved version',
+        'Basic explanations',
+
+        'Color-coded sentence mapping',
+      ],
+      buttonText: 'Current Plan',
+      variant: 'outline' as const,
+      popular: false,
+      current: true,
+    },
+    {
+      name: firstPlan.title,
+      price: firstPlan.price,
+      period: firstPlan.currency,
+      description: firstPlan.description,
+      icon: <Crown className="h-6 w-6" />,
+      features: firstPlan.features,
+
+      buttonText: 'Get Premium',
+      variant: 'default' as const,
+      popular: true,
+      current: false,
+      isLoading:
+        (isPending && variables === firstPlan._id) ||
+        (isPendingClick && variablesClick === firstPlan._id),
+    },
+  ];
+
+  console.log('user', user);
+
+  const buyPremium = (plan: Plan) => handleGetPremium(plan);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+
+      <main className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center space-y-6 mb-16">
+            <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+              IELTS Band Uplift - AI-Powered Essay Improvement for Band 7, 8 & 9
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto">
+              Get personalized IELTS essay improvements that preserve your ideas
+              while upgrading your language to Band 7, 8, or 9 standards.
+            </p>
+          </div>
+
+          {/* Pricing Cards */}
+          <div className="flex flex-col md:flex-row md:[&>*]:w-[33%] justify-center gap-8 max-w-6xl mx-auto">
+            {plans.map(plan => (
+              <Card
+                key={plan.name}
+                className={`relative shadow-medium ${
+                  plan.popular ? 'ring-2 ring-green-500 shadow-strong' : ''
+                } ${plan.current ? 'bg-muted/20' : ''}`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-green-500 text-white px-4 py-1 rounded-full">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+
+                <CardHeader className="text-center pb-6">
+                  <div className="flex justify-center mb-4">
+                    <div
+                      className={`inline-flex p-4 rounded-full ${
+                        plan.popular
+                          ? 'bg-green-100'
+                          : plan.current
+                          ? 'bg-green-100'
+                          : 'bg-gray-100'
+                      }`}
+                    >
+                      <div
+                        className={`${
+                          plan.popular
+                            ? 'text-green-600'
+                            : plan.current
+                            ? 'text-green-600'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        {plan.icon}
+                      </div>
+                    </div>
+                  </div>
+
+                  <CardTitle className="text-2xl font-bold">
+                    {plan.name}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {plan.description}
+                  </p>
+
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span
+                        className={`text-4xl font-bold ${
+                          plan.name === 'Single Check'
+                            ? 'text-green-600'
+                            : plan.popular
+                            ? 'text-green-600'
+                            : 'text-green-600'
+                        }`}
+                      >
+                        {plan.price}
+                      </span>
+                      {plan.period && (
+                        <span className="text-muted-foreground text-lg">
+                          {plan.period}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, index) => (
+                        <li
+                          key={index}
+                          className="flex items-start gap-3 text-sm"
+                        >
+                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Button
+                    variant={plan.current ? 'outline' : plan.variant}
+                    size="lg"
+                    className={`w-full ${
+                      plan.popular
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : ''
+                    } ${plan.current ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    disabled={plan.current || plan.isLoading}
+                    onClick={() => buyPremium(firstPlan)}
+                  >
+                    {plan.isLoading ? 'Loading...' : plan.buttonText}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Choose Payment Method
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm">
+              Choose a payment method for {selectedPlan?.title} (
+              {selectedPlan?.price} {selectedPlan?.currency})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center gap-4">
+            <button
+              className="border-2 h-12 w-24 rounded-lg border-[#21C55D] flex items-center justify-center "
+              onClick={handlePaymePayment}
+              disabled={isPending}
+            >
+              <Payme />
+              {isPending && <span className="ml-2">Processing...</span>}
+            </button>
+            <button
+              className="border-2 w-24 h-12 rounded-lg border-[#21C55D] flex items-center justify-center"
+              onClick={handleClickPayment}
+              disabled={isPendingClick}
+            >
+              <Click />
+              {isPendingClick && <span className="ml-2">Processing...</span>}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Pricing;

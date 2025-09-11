@@ -1,0 +1,25 @@
+<svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- IELTS text -->
+  <text x="10" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="url(#textGradient)">IELTS</text>
+
+  <!-- Essay Band Uplift text -->
+  <text x="70" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="url(#accentGradient)">Essay Band Uplift</text>
+
+  <!-- Small icon -->
+  <circle cx="185" cy="20" r="8" fill="url(#textGradient)"/>
+  <path d="M185 16l-2-2-2 2v-2h4v2z" fill="white"/>
+</svg>
+
+
+
