@@ -34,20 +34,23 @@ export interface Submission {
     improvedVersions?: {
       band7: {
         introduction: string;
-        body_one: string;
-        body_two: string;
+        body?: string[];
+        body_one?: string;
+        body_two?: string;
         conclusion: string;
       };
       band8: {
         introduction: string;
-        body_one: string;
-        body_two: string;
+        body?: string[];
+        body_one?: string;
+        body_two?: string;
         conclusion: string;
       };
       band9: {
         introduction: string;
-        body_one: string;
-        body_two: string;
+        body?: string[];
+        body_one?: string;
+        body_two?: string;
         conclusion: string;
       };
     };

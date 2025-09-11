@@ -206,7 +206,6 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
         await analyzeSubmissionMutation.mutateAsync(submissionId);
         
         console.log('Analysis completed successfully');
-        toast.success('Essay submitted for analysis. Please wait...');
         onCreated(submissionId);
       } else {
         console.error('No submission ID found in response:', response);

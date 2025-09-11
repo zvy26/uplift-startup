@@ -89,7 +89,7 @@ export const EssayAnalyzerWrapper = ({
   const {
     data: specificSubmission,
     isLoading: isLoadingSpecific,
-  } = useSubmissionById(submissionId);
+  } = useSubmissionById(submissionId || currentSubmissionId);
 
   const {
     data: latestSubmission,
@@ -97,11 +97,11 @@ export const EssayAnalyzerWrapper = ({
     isFailed,
     isLoading: submissionsLoading,
     isPendingAnalysed,
-  } = useLatestSubmission(authenticated && !submissionId); // Only fetch latest if no specific submission ID
+  } = useLatestSubmission(authenticated && !submissionId && !currentSubmissionId); // Only fetch latest if no specific submission ID and no current submission
 
   // Determine which submission to use
-  const activeSubmission = submissionId ? specificSubmission : latestSubmission;
-  const isLoadingSubmission = submissionId ? isLoadingSpecific : submissionsLoading;
+  const activeSubmission = (submissionId || currentSubmissionId) ? specificSubmission : latestSubmission;
+  const isLoadingSubmission = (submissionId || currentSubmissionId) ? isLoadingSpecific : submissionsLoading;
 
   const submitEssayMutation = useSubmitEssay();
 
@@ -195,7 +195,7 @@ export const EssayAnalyzerWrapper = ({
       hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions
     });
     
-    if (activeSubmission && (!currentSubmissionId || activeSubmission._id === currentSubmissionId)) {
+    if (activeSubmission && activeSubmission.aiFeedback?.improvedVersions && (submissionId || currentSubmissionId)) {
       setHasAnalyzed(true);
 
       // Convert API data to UiBandVersion format
@@ -306,7 +306,8 @@ export const EssayAnalyzerWrapper = ({
   // Determine which component to render - show results for current submission or specific submission from URL
   const shouldShowResults =
     activeSubmission &&
-    (currentSubmissionId ? activeSubmission._id === currentSubmissionId : true) && // If currentSubmissionId exists, match it; otherwise show any active submission
+    activeSubmission.aiFeedback?.improvedVersions && // Must have AI feedback with improved versions
+    (submissionId || currentSubmissionId) && // Show results if: 1) specific submissionId from URL, or 2) currentSubmissionId exists (user just analyzed)
     (activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS ||
       activeSubmission.status === IELTSWritingSubmissionStatus.IDLE ||
       activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED);
@@ -318,10 +319,18 @@ export const EssayAnalyzerWrapper = ({
     isAnalyzed,
     isPendingAnalysed,
     bandVersions: bandVersions.length,
-    hasAnalyzed
+    hasAnalyzed,
+    submissionId,
+    hasAiFeedback: !!activeSubmission?.aiFeedback,
+    hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions,
+    statusCheck: activeSubmission ? {
+      isInProgress: activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS,
+      isIdle: activeSubmission.status === IELTSWritingSubmissionStatus.IDLE,
+      isAnalyzed: activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED
+    } : null
   });
 
-  const shouldShowProcessing = isProcessing && (!currentSubmissionId || activeSubmission?._id === currentSubmissionId) && !submissionId;
+  const shouldShowProcessing = isProcessing && currentSubmissionId && activeSubmission?._id === currentSubmissionId && !submissionId;
 
   // Show loading state when fetching specific submission
   if (isLoadingSubmission) {
@@ -392,6 +401,7 @@ export const EssayAnalyzerWrapper = ({
     <EssayCreator
       isAnalyzing={isProcessing}
       onCreated={(submissionId?: string) => {
+        console.log('EssayCreator onCreated called with submissionId:', submissionId);
         setIsAnalyzed(true);
         if (submissionId) {
           setCurrentSubmissionId(submissionId);
