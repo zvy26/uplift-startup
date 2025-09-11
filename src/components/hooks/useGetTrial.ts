@@ -9,8 +9,36 @@ export const useGetTrial = () => {
     enabled: !!user,
     queryFn: async () => {
       try {
+        // Try to get user profile first (which contains userPlan)
+        const profileRes = await http.get(`/users/profile`).then(r => r.data);
+        const userPlan = profileRes?.data?.userPlan;
+        
+        if (userPlan) {
+          return {
+            _id: userPlan._id ?? '',
+            user: profileRes?.data?._id ?? '',
+            plan: userPlan.plan?.title ?? '',
+            freeTrialCount: userPlan.subscriptionType === 'FREE' ? (userPlan.submissionsLimit - userPlan.submissionsUsed) : 0,
+            premiumTrialCount: userPlan.subscriptionType === 'PREMIUM' ? (userPlan.submissionsLimit - userPlan.submissionsUsed) : 0,
+            hasPaidPlan: userPlan.hasPaidPlan ?? false,
+            submissionsUsed: userPlan.submissionsUsed ?? 0,
+            submissionsLimit: userPlan.submissionsLimit ?? 0,
+            remainingSubmissions: Math.max(0, (userPlan.submissionsLimit ?? 0) - (userPlan.submissionsUsed ?? 0)),
+          } as {
+            _id: string;
+            user: string;
+            plan: string;
+            freeTrialCount: number;
+            premiumTrialCount: number;
+            hasPaidPlan: boolean;
+            submissionsUsed: number;
+            submissionsLimit: number;
+            remainingSubmissions: number;
+          };
+        }
+        
+        // Fallback to user-plans endpoint if userPlan not found
         const res = await http.get(`/user-plans`).then(r => r.data);
-        // Handle array response from user-plans
         const payload = Array.isArray(res?.data) ? res.data[0] : (res?.data ?? res);
         return {
           _id: payload?._id ?? '',

@@ -121,9 +121,10 @@ export const useAnalyzeSubmission = () => {
       const response = await essayAPI.analyzeSubmission(submissionId);
       return response;
     },
-    onSuccess: async () => {
+    onSuccess: async (data, submissionId) => {
       await queryClient.invalidateQueries({ queryKey: ['submissions'] });
       await queryClient.invalidateQueries({ queryKey: ['latest-submission'] });
+      await queryClient.invalidateQueries({ queryKey: ['submission', submissionId] });
     },
     onError: error => {
       console.error('Essay analysis error:', error);

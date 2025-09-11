@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,6 @@ import { useTopics } from '@/services/topicQueries';
 import { Separator } from '@radix-ui/react-separator';
 import { toast } from 'sonner';
 import { SendSubmission } from '@/modules/essay/types/SendSubmission';
-import { useSubmitEssay, useAnalyzeSubmission } from '@/services/essayMutations';
 import { useAuthContext } from '@/auth/hooks/useAuthContext';
 import { paths } from '@/routes/paths';
 import { useGetTrial } from './hooks/useGetTrial';
@@ -29,11 +29,11 @@ import {
 
 interface EssayCreatorProps {
   isAnalyzing: boolean;
-  onCreated: (submissionId?: string) => void;
+  onAnalyzeEssay: (submissionData: SendSubmission) => Promise<string>;
   onStartNewAnalysis?: () => void;
 }
 
-export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: EssayCreatorProps) => {
+export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }: EssayCreatorProps) => {
   const navigate = useNavigate();
   const { data } = useGetTrial();
   const {
@@ -54,11 +54,9 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
 
   const canAnalyzeWithPlan = hasPaidPlan
     ? remainingSubmissions > 0
-    : freeTrialCount > 0;
+    : remainingSubmissions > 0; // For free users, check remainingSubmissions instead of freeTrialCount
   const finalCanAnalyze = authenticated ? canAnalyzeWithPlan : true; // Allow non-authenticated users to write essays
 
-  const submitEssayMutation = useSubmitEssay();
-  const analyzeSubmissionMutation = useAnalyzeSubmission();
 
   const [essay, setEssay] = useState('');
   const [topicSource, setTopicSource] = useState<'generated' | 'custom'>(
@@ -98,6 +96,7 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
     .split(/\s+/)
     .filter(word => word.length > 0).length;
   const charCount = essay.length;
+
 
   const handleTopicChange = (topicId: string) => {
     const topic = topics?.find(t => t._id === topicId);
@@ -186,31 +185,9 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
     }
 
     try {
-      console.log('Submitting essay with data:', submissionData);
-      
-      // First submit the essay
-      const response = await submitEssayMutation.mutateAsync(submissionData);
-      console.log('Submission response:', response);
-      
-      // Extract submission ID from response
-      const submissionId = response?.data?._id ?? response?._id ?? response?.data?.id ?? response?.id;
-      console.log('Extracted submission ID:', submissionId);
-
-      if (submissionId) {
-        console.log('Triggering analysis for submission ID:', submissionId);
-        
-        // Add a small delay to ensure submission is fully processed
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Then trigger analysis
-        await analyzeSubmissionMutation.mutateAsync(submissionId);
-        
-        console.log('Analysis completed successfully');
-        onCreated(submissionId);
-      } else {
-        console.error('No submission ID found in response:', response);
-        throw new Error('No submission ID received');
-      }
+      console.log('Calling onAnalyzeEssay with data:', submissionData);
+      await onAnalyzeEssay(submissionData);
+      console.log('Essay analysis completed successfully');
     } catch (error) {
       console.error('Error analyzing essay:', error);
       
@@ -404,28 +381,28 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
                         </span>
                         <Badge
                           variant={
-                            freeTrialCount > 0 ? 'secondary' : 'destructive'
+                            remainingSubmissions > 0 ? 'secondary' : 'destructive'
                           }
                         >
-                          {freeTrialCount}
+                          {remainingSubmissions}
                         </Badge>
                       </div>
                       <Progress
                         value={
-                          ((maxFreeTrialCount - freeTrialCount) /
-                            maxFreeTrialCount) *
+                          ((submissionsLimit - remainingSubmissions) /
+                            submissionsLimit) *
                           100
                         }
                         className={`h-2 ${
-                          freeTrialCount === 0 ? 'bg-green-200' : ''
+                          remainingSubmissions === 0 ? 'bg-green-200' : ''
                         }`}
                       />
                       <p className="text-xs text-muted-foreground mt-2">
-                        {freeTrialCount > 0
-                          ? `You have ${freeTrialCount} free analysis${
-                              freeTrialCount === 1 ? '' : 'es'
-                            } left`
-                          : 'Upgrade to get 10 essay analysis'}
+                        {remainingSubmissions > 0
+                          ? `You have ${remainingSubmissions} free analysis${
+                              remainingSubmissions === 1 ? '' : 'es'
+                            } left out of ${submissionsLimit}`
+                          : `You have used all ${submissionsLimit} submissions`}
                       </p>
                     </div>
                   )}
@@ -471,7 +448,7 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
                         ? analyzeEssay
                         : handleGetPremium
                     }
-                    disabled={isAnalyzing || submitEssayMutation.isPending || analyzeSubmissionMutation.isPending}
+                    disabled={isAnalyzing}
                     className={
                       !authenticated || finalCanAnalyze
                         ? 'bg-gradient-primary hover:opacity-90'
@@ -486,7 +463,7 @@ export const EssayCreator = ({ isAnalyzing, onCreated, onStartNewAnalysis }: Ess
                         <Lock className="h-4 w-4 mr-2" />
                         Get Premium
                       </>
-                    ) : (submitEssayMutation.isPending || analyzeSubmissionMutation.isPending) ? (
+                    ) : isAnalyzing ? (
                       'Analyzing...'
                     ) : (
                       'Analyze Essay'

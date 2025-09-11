@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/ui/navigation';
 import { EssayAnalyzer } from '@/components/EssayAnalyzer';
-import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/auth/hooks/useAuthContext';
 
 const Index = () => {
-  const { logout, authenticated } = useAuthContext();
+  const { authenticated } = useAuthContext();
   const [displayedScore, setDisplayedScore] = useState<number>(0.0);
   const [currentBand, setCurrentBand] = useState<number | null>(null);
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
@@ -41,13 +40,6 @@ const Index = () => {
 
       <main className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex justify-end">
-            {authenticated && (
-              <Button variant="outline" onClick={logout}>
-                Logout
-              </Button>
-            )}
-          </div>
           {/* Hero Section */}
           <div className="text-center space-y-6">
             <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent">

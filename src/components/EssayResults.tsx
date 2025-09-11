@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import { Submission } from '@/modules/essay/types/Submission';
+import { SentenceText } from './SentenceText';
 
 interface AnalysisOptions {
   colorAlignment: boolean;
@@ -211,31 +212,30 @@ export const EssayResults = ({
               <div className="space-y-4">
                 {selectedVersion ? (
                   <>
-                    <div
-                      className={`p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50/50 text-sm transition-all duration-200 cursor-pointer ${
-                        hoveredSentence === 'paragraph-0' ||
-                        hoveredSentence === null
-                          ? 'ring-2 ring-blue-200 shadow-md'
-                          : ''
-                      }`}
-                      onMouseEnter={() => setHoveredSentence('paragraph-0')}
-                      onMouseLeave={() => setHoveredSentence(null)}
-                    >
+                    <div className="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50/50 text-sm">
                       <h4 className="font-semibold mb-2 text-blue-800">Introduction</h4>
                       <div className="text-gray-700">
-                        {typeof selectedVersion.paragraphs[0] === 'string'
-                          ? (selectedVersion.paragraphs[0] as string)
-                          : (selectedVersion.paragraphs[0] as ParagraphMap)
-                              ?.original ||
-                            originalSplitted[0] ||
-                            'No introduction found'}
+                        <SentenceText
+                          text={
+                            typeof selectedVersion.paragraphs[0] === 'string'
+                              ? (selectedVersion.paragraphs[0] as string)
+                              : (selectedVersion.paragraphs[0] as ParagraphMap)
+                                  ?.original ||
+                                originalSplitted[0] ||
+                                'No introduction found'
+                          }
+                          paragraphId="original-intro"
+                          activeSentenceId={hoveredSentence}
+                          onSentenceHover={setHoveredSentence}
+                          onSentenceFocus={setHoveredSentence}
+                        />
                       </div>
                     </div>
                     <Separator />
                     {originalSplitted.slice(1, -1).map((paragraph, index) => (
                       <div key={index}>
                         <div
-                          className={`p-4 rounded-lg border-l-4 text-sm transition-all duration-200 cursor-pointer ${
+                          className={`p-4 rounded-lg border-l-4 text-sm ${
                             index === 0 
                               ? 'border-green-500 bg-green-50/50' 
                               : index === 1 
@@ -243,16 +243,7 @@ export const EssayResults = ({
                               : index === 2 
                               ? 'border-purple-500 bg-purple-50/50'
                               : 'border-red-500 bg-red-50/50'
-                          } ${
-                            hoveredSentence === `paragraph-${index + 1}` ||
-                            hoveredSentence === null
-                              ? 'ring-2 ring-opacity-50 shadow-md'
-                              : ''
                           }`}
-                          onMouseEnter={() =>
-                            setHoveredSentence(`paragraph-${index + 1}`)
-                          }
-                          onMouseLeave={() => setHoveredSentence(null)}
                         >
                           <h4 className={`font-semibold mb-2 ${
                             index === 0 
@@ -266,18 +257,18 @@ export const EssayResults = ({
                             Body Paragraph {index + 1}
                           </h4>
                           <div className="text-gray-700">
-                            {typeof selectedVersion.paragraphs[index + 1] ===
-                            'string'
-                              ? (selectedVersion.paragraphs[
-                                  index + 1
-                                ] as string)
-                              : (
-                                  selectedVersion.paragraphs[
-                                    index + 1
-                                  ] as ParagraphMap
-                                )?.original ||
-                                paragraph ||
-                                `No body paragraph ${index + 1} found`}
+                            <SentenceText
+                              text={
+                                typeof selectedVersion.paragraphs[index + 1] === 'string'
+                                  ? (selectedVersion.paragraphs[index + 1] as string)
+                                  : (selectedVersion.paragraphs[index + 1] as ParagraphMap)
+                                      ?.original || paragraph || `No body paragraph ${index + 1} found`
+                              }
+                              paragraphId={`original-body-${index + 1}`}
+                              activeSentenceId={hoveredSentence}
+                              onSentenceHover={setHoveredSentence}
+                              onSentenceFocus={setHoveredSentence}
+                            />
                           </div>
                         </div>
                         {index < originalSplitted.slice(1, -1).length - 1 && (
@@ -288,36 +279,21 @@ export const EssayResults = ({
                     {originalSplitted.length > 1 && (
                       <>
                         <Separator />
-                        <div
-                          className={`p-4 rounded-lg border-l-4 border-green-500 bg-green-50/50 text-sm transition-all duration-200 cursor-pointer ${
-                            hoveredSentence ===
-                              `paragraph-${originalSplitted.length - 1}` ||
-                            hoveredSentence === null
-                              ? 'ring-2 ring-green-200 shadow-md'
-                              : ''
-                          }`}
-                          onMouseEnter={() =>
-                            setHoveredSentence(
-                              `paragraph-${originalSplitted.length - 1}`
-                            )
-                          }
-                          onMouseLeave={() => setHoveredSentence(null)}
-                        >
+                        <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-50/50 text-sm">
                           <h4 className="font-semibold mb-2 text-green-800">Conclusion</h4>
                           <div className="text-gray-700">
-                            {typeof selectedVersion.paragraphs[
-                              originalSplitted.length - 1
-                            ] === 'string'
-                              ? (selectedVersion.paragraphs[
-                                  originalSplitted.length - 1
-                                ] as string)
-                              : (
-                                  selectedVersion.paragraphs[
-                                    originalSplitted.length - 1
-                                  ] as ParagraphMap
-                                )?.original ||
-                                originalSplitted[originalSplitted.length - 1] ||
-                                'No conclusion found'}
+                            <SentenceText
+                              text={
+                                typeof selectedVersion.paragraphs[originalSplitted.length - 1] === 'string'
+                                  ? (selectedVersion.paragraphs[originalSplitted.length - 1] as string)
+                                  : (selectedVersion.paragraphs[originalSplitted.length - 1] as ParagraphMap)
+                                      ?.original || originalSplitted[originalSplitted.length - 1] || 'No conclusion found'
+                              }
+                              paragraphId="original-conclusion"
+                              activeSentenceId={hoveredSentence}
+                              onSentenceHover={setHoveredSentence}
+                              onSentenceFocus={setHoveredSentence}
+                            />
                           </div>
                         </div>
                       </>
@@ -484,25 +460,24 @@ export const EssayResults = ({
               {selectedVersion && (
                 <div className="space-y-4">
                   <div className="space-y-4">
-                    <div
-                      className={`p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50/50 text-sm transition-all duration-200 cursor-pointer ${
-                        hoveredSentence === 'paragraph-0' ||
-                        hoveredSentence === null
-                          ? 'ring-2 ring-blue-200 shadow-md'
-                          : ''
-                      }`}
-                      onMouseEnter={() => setHoveredSentence('paragraph-0')}
-                      onMouseLeave={() => setHoveredSentence(null)}
-                    >
+                    <div className="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50/50 text-sm">
                       <h4 className="font-semibold mb-2 text-blue-800">Introduction</h4>
-                      <div className="text-gray-700">{selectedVersion.sections.introduction}</div>
+                      <div className="text-gray-700">
+                        <SentenceText
+                          text={selectedVersion.sections.introduction}
+                          paragraphId="improved-intro"
+                          activeSentenceId={hoveredSentence}
+                          onSentenceHover={setHoveredSentence}
+                          onSentenceFocus={setHoveredSentence}
+                        />
+                      </div>
                     </div>
                     <Separator />
                     {selectedVersion.sections.body.map(
                       (bodyParagraph, index) => (
                         <div key={index}>
                           <div
-                            className={`p-4 rounded-lg border-l-4 text-sm transition-all duration-200 cursor-pointer ${
+                            className={`p-4 rounded-lg border-l-4 text-sm ${
                               index === 0 
                                 ? 'border-green-500 bg-green-50/50' 
                                 : index === 1 
@@ -510,16 +485,7 @@ export const EssayResults = ({
                                 : index === 2 
                                 ? 'border-purple-500 bg-purple-50/50'
                                 : 'border-red-500 bg-red-50/50'
-                            } ${
-                              hoveredSentence === `paragraph-${index + 1}` ||
-                              hoveredSentence === null
-                                ? 'ring-2 ring-opacity-50 shadow-md'
-                                : ''
                             }`}
-                            onMouseEnter={() =>
-                              setHoveredSentence(`paragraph-${index + 1}`)
-                            }
-                            onMouseLeave={() => setHoveredSentence(null)}
                           >
                             <h4 className={`font-semibold mb-2 ${
                               index === 0 
@@ -532,7 +498,15 @@ export const EssayResults = ({
                             }`}>
                               Body Paragraph {index + 1}
                             </h4>
-                            <div className="text-gray-700">{bodyParagraph}</div>
+                            <div className="text-gray-700">
+                              <SentenceText
+                                text={bodyParagraph}
+                                paragraphId={`improved-body-${index + 1}`}
+                                activeSentenceId={hoveredSentence}
+                                onSentenceHover={setHoveredSentence}
+                                onSentenceFocus={setHoveredSentence}
+                              />
+                            </div>
                           </div>
                           {index < selectedVersion.sections.body.length - 1 && (
                             <Separator />
@@ -543,26 +517,17 @@ export const EssayResults = ({
                     {selectedVersion.sections.conclusion && (
                       <>
                         <Separator />
-                        <div
-                          className={`p-4 rounded-lg border-l-4 border-green-500 bg-green-50/50 text-sm transition-all duration-200 cursor-pointer ${
-                            hoveredSentence ===
-                              `paragraph-${
-                                selectedVersion.sections.body.length + 1
-                              }` || hoveredSentence === null
-                              ? 'ring-2 ring-green-200 shadow-md'
-                              : ''
-                          }`}
-                          onMouseEnter={() =>
-                            setHoveredSentence(
-                              `paragraph-${
-                                selectedVersion.sections.body.length + 1
-                              }`
-                            )
-                          }
-                          onMouseLeave={() => setHoveredSentence(null)}
-                        >
+                        <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-50/50 text-sm">
                           <h4 className="font-semibold mb-2 text-green-800">Conclusion</h4>
-                          <div className="text-gray-700">{selectedVersion.sections.conclusion}</div>
+                          <div className="text-gray-700">
+                            <SentenceText
+                              text={selectedVersion.sections.conclusion}
+                              paragraphId="improved-conclusion"
+                              activeSentenceId={hoveredSentence}
+                              onSentenceHover={setHoveredSentence}
+                              onSentenceFocus={setHoveredSentence}
+                            />
+                          </div>
                         </div>
                       </>
                     )}

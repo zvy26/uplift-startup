@@ -6,7 +6,6 @@ import {
 } from 'react-router-dom';
 
 import { useAuthContext } from '@/auth/hooks/useAuthContext';
-import { PageLoading } from '@/components/PageLoading';
 
 import { notFound } from './404';
 import { authRoutes } from './auth';
@@ -26,10 +25,20 @@ export const Router = () => {
 
   const router = createBrowserRouter(routes);
 
-  if (loading) return <PageLoading />;
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <Suspense fallback={<PageLoading />}>
+    <Suspense fallback={
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    }>
       <RouterProvider router={router} />
     </Suspense>
   );

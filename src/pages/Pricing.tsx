@@ -1,5 +1,4 @@
 import { useAuthContext } from '@/auth/hooks/useAuthContext';
-import { PageLoading } from '@/components/PageLoading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,11 +32,29 @@ const Pricing = () => {
     variables: variablesClick,
   } = useCreateOrderClick();
 
-  const firstPlan = data?.[0];
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
-  if (isLoading) return <PageLoading />;
-
-  if (!firstPlan) return null;
+  const plansData = Array.isArray(data) ? data : data?.data || [];
+  
+  if (!plansData || plansData.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-2xl font-bold text-foreground">No plans available</h1>
+            <p className="text-muted-foreground mt-4">Please check back later.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const handleGetPremium = (plan: Plan) => {
     if (!user) {
@@ -62,47 +79,24 @@ const Pricing = () => {
     }
   };
 
-  const plans = [
-    {
-      name: 'Freemium',
-      price: 'Free',
-      period: '',
-      description: 'Perfect for trying out our service',
-      icon: <Star className="h-6 w-6" />,
-      features: [
-        '1 free essay check',
-        'Band score estimation',
-        'Band 7 improved version',
-        'Basic explanations',
-
-        'Color-coded sentence mapping',
-      ],
-      buttonText: 'Current Plan',
-      variant: 'outline' as const,
-      popular: false,
-      current: true,
-    },
-    {
-      name: firstPlan.title,
-      price: firstPlan.price,
-      period: firstPlan.currency,
-      description: firstPlan.description,
-      icon: <Crown className="h-6 w-6" />,
-      features: firstPlan.features,
-
-      buttonText: 'Get Premium',
-      variant: 'default' as const,
-      popular: true,
-      current: false,
-      isLoading:
-        (isPending && variables === firstPlan._id) ||
-        (isPendingClick && variablesClick === firstPlan._id),
-    },
-  ];
+  // Transform API data to display format
+  const plans = plansData.map((plan) => ({
+    id: plan._id,
+    name: plan.title,
+    price: plan.price === 0 ? 'Free' : plan.price,
+    period: plan.price === 0 ? '' : plan.currency,
+    description: plan.description,
+    icon: plan.type === 'FREE' ? <Star className="h-6 w-6" /> : <Crown className="h-6 w-6" />,
+    features: plan.features,
+    buttonText: plan.price === 0 ? 'Current Plan' : 'Get Premium',
+    variant: plan.price === 0 ? 'outline' as const : 'default' as const,
+    popular: plan.isPopular,
+    current: plan.price === 0, // Assuming free plan is current
+    isLoading: (isPending && variables === plan._id) || (isPendingClick && variablesClick === plan._id),
+    plan: plan, // Keep reference to original plan data
+  }));
 
   console.log('user', user);
-
-  const buyPremium = (plan: Plan) => handleGetPremium(plan);
 
   return (
     <div className="min-h-screen bg-background">
@@ -216,7 +210,7 @@ const Pricing = () => {
                         : ''
                     } ${plan.current ? 'opacity-60 cursor-not-allowed' : ''}`}
                     disabled={plan.current || plan.isLoading}
-                    onClick={() => buyPremium(firstPlan)}
+                    onClick={() => handleGetPremium(plan.plan)}
                   >
                     {plan.isLoading ? 'Loading...' : plan.buttonText}
                   </Button>

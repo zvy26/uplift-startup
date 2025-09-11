@@ -110,7 +110,6 @@ const MySubmissions = () => {
 
   const handleViewSubmission = (submission: Submission) => {
     if (submission.status === 'ANALYZED') {
-      // Navigate to results page with submission ID
       navigate(`/ielts-writing?submission=${submission._id}`);
     }
   };
@@ -120,7 +119,6 @@ const MySubmissions = () => {
     return text.substring(0, maxLength) + '...';
   };
 
-  // Filter and sort submissions
   const filteredAndSortedSubmissions = submissions
     .filter(submission => {
       if (filterStatus === 'all') return true;

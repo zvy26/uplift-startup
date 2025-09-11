@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useSubmitEssay, useLatestSubmission, useSubmissionById } from '@/services/essayMutations';
+import { useSubmitEssay, useAnalyzeSubmission, useLatestSubmission, useSubmissionById } from '@/services/essayMutations';
 import { SendSubmission } from '@/modules/essay/types/SendSubmission';
 import { EssayCreator } from './EssayCreator';
 import { EssayResults } from './EssayResults';
@@ -74,7 +74,53 @@ export const EssayAnalyzerWrapper = ({
     setBandVersions([]);
     setCurrentBand(null);
     setIsAnalyzed(false);
+    setIsProcessingEssay(false);
     onScoreUpdate(null, false);
+  };
+
+  // Function to handle essay analysis
+  const handleEssayAnalysis = async (submissionData: SendSubmission) => {
+    try {
+      setIsProcessingEssay(true);
+      console.log('Starting essay analysis with data:', submissionData);
+      
+      // First submit the essay
+      const response = await submitEssayMutation.mutateAsync(submissionData);
+      console.log('Submission response:', response);
+      
+      // Extract submission ID from response
+      const submissionId = response?.data?._id ?? response?._id ?? response?.data?.id ?? response?.id;
+      console.log('Extracted submission ID:', submissionId);
+
+      if (submissionId) {
+        console.log('Triggering analysis for submission ID:', submissionId);
+        setCurrentSubmissionId(submissionId);
+        
+        // Add a small delay to ensure submission is fully processed
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Then trigger analysis
+        await analyzeSubmissionMutation.mutateAsync(submissionId);
+        
+        console.log('Analysis completed successfully');
+        setIsAnalyzed(true);
+        
+        // Force a refetch of the submission data
+        console.log('Forcing refetch of submission data for ID:', submissionId);
+        await refetchSpecificSubmission();
+        
+        // Don't set isProcessingEssay to false here - let shouldShowProcessing logic handle it
+        // based on the actual submission data state
+        return submissionId;
+      } else {
+        console.error('No submission ID found in response:', response);
+        throw new Error('No submission ID received');
+      }
+    } catch (error) {
+      console.error('Error analyzing essay:', error);
+      setIsProcessingEssay(false);
+      throw error;
+    }
   };
 
   const ieltsTips = [
@@ -89,6 +135,7 @@ export const EssayAnalyzerWrapper = ({
   const {
     data: specificSubmission,
     isLoading: isLoadingSpecific,
+    refetch: refetchSpecificSubmission,
   } = useSubmissionById(submissionId || currentSubmissionId);
 
   const {
@@ -104,6 +151,10 @@ export const EssayAnalyzerWrapper = ({
   const isLoadingSubmission = (submissionId || currentSubmissionId) ? isLoadingSpecific : submissionsLoading;
 
   const submitEssayMutation = useSubmitEssay();
+  const analyzeSubmissionMutation = useAnalyzeSubmission();
+  
+  // Track if we're currently processing an essay
+  const [isProcessingEssay, setIsProcessingEssay] = useState(false);
 
   const [options, setOptions] = useState<AnalysisOptions>({
     colorAlignment: true,
@@ -113,9 +164,24 @@ export const EssayAnalyzerWrapper = ({
 
   // Auto-analysis after login is disabled; user must click Analyze manually.
 
-  // Rotate tips every 4 seconds
+  // Determine loading state early for tip rotation
+  const shouldShowProcessing = 
+    // Show loading when we're processing an essay (immediate feedback)
+    isProcessingEssay ||
+    // Show loading when mutations are pending
+    submitEssayMutation.isPending || 
+    analyzeSubmissionMutation.isPending ||
+    // Show loading when we have a submission that's being processed (but not if it's already analyzed)
+    (currentSubmissionId && activeSubmission && 
+     !activeSubmission.aiFeedback?.improvedVersions &&
+     (activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS || 
+      activeSubmission.status === IELTSWritingSubmissionStatus.IDLE)) ||
+    // Show loading when we have a submission but no results yet
+    (currentSubmissionId && !activeSubmission);
+
+  // Rotate tips every 4 seconds when processing
   useEffect(() => {
-    if (isProcessing) {
+    if (shouldShowProcessing) {
       const interval = setInterval(() => {
         setIsTipVisible(false);
         setTimeout(() => {
@@ -126,7 +192,7 @@ export const EssayAnalyzerWrapper = ({
 
       return () => clearInterval(interval);
     }
-  }, [ieltsTips.length, isProcessing]);
+  }, [ieltsTips.length, shouldShowProcessing]);
 
   const splitIntoParagraphs = (text: string): string[] => {
     return text.split('\n').filter(paragraph => paragraph.trim().length > 0);
@@ -189,8 +255,15 @@ export const EssayAnalyzerWrapper = ({
   // Handle latest submission data - only show results for current submission
   useEffect(() => {
     console.log('EssayAnalyzerWrapper useEffect triggered:', {
-      activeSubmission: activeSubmission ? { id: activeSubmission._id, status: activeSubmission.status } : null,
+      activeSubmission: activeSubmission ? { 
+        id: activeSubmission._id, 
+        status: activeSubmission.status,
+        hasAiFeedback: !!activeSubmission.aiFeedback,
+        hasImprovedVersions: !!activeSubmission.aiFeedback?.improvedVersions,
+        improvedVersionsKeys: activeSubmission.aiFeedback?.improvedVersions ? Object.keys(activeSubmission.aiFeedback.improvedVersions) : []
+      } : null,
       currentSubmissionId,
+      submissionId,
       hasAiFeedback: !!activeSubmission?.aiFeedback,
       hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions
     });
@@ -292,6 +365,9 @@ export const EssayAnalyzerWrapper = ({
 
         // Notify parent component with actual score from API
         onScoreUpdate(activeSubmission.score, true);
+        
+        // Stop processing state when we have results
+        setIsProcessingEssay(false);
       }
     }
   }, [
@@ -312,10 +388,25 @@ export const EssayAnalyzerWrapper = ({
       activeSubmission.status === IELTSWritingSubmissionStatus.IDLE ||
       activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED);
 
+  console.log('shouldShowResults calculation:', {
+    hasActiveSubmission: !!activeSubmission,
+    hasAiFeedback: !!activeSubmission?.aiFeedback,
+    hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions,
+    hasSubmissionId: !!(submissionId || currentSubmissionId),
+    status: activeSubmission?.status,
+    statusMatches: activeSubmission ? (
+      activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS ||
+      activeSubmission.status === IELTSWritingSubmissionStatus.IDLE ||
+      activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED
+    ) : false,
+    shouldShowResults
+  });
+
   console.log('EssayAnalyzerWrapper Debug:', {
     activeSubmission: activeSubmission ? { id: activeSubmission._id, status: activeSubmission.status } : null,
     currentSubmissionId,
     shouldShowResults,
+    shouldShowProcessing,
     isAnalyzed,
     isPendingAnalysed,
     bandVersions: bandVersions.length,
@@ -323,6 +414,9 @@ export const EssayAnalyzerWrapper = ({
     submissionId,
     hasAiFeedback: !!activeSubmission?.aiFeedback,
     hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions,
+    isProcessingEssay,
+    submitEssayPending: submitEssayMutation.isPending,
+    analyzePending: analyzeSubmissionMutation.isPending,
     statusCheck: activeSubmission ? {
       isInProgress: activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS,
       isIdle: activeSubmission.status === IELTSWritingSubmissionStatus.IDLE,
@@ -330,10 +424,8 @@ export const EssayAnalyzerWrapper = ({
     } : null
   });
 
-  const shouldShowProcessing = isProcessing && currentSubmissionId && activeSubmission?._id === currentSubmissionId && !submissionId;
-
-  // Show loading state when fetching specific submission
-  if (isLoadingSubmission) {
+  // Show loading state when fetching specific submission (only for URL-based submissions)
+  if (isLoadingSubmission && submissionId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
         <div className="p-4 bg-accent/10 rounded-full">
@@ -399,14 +491,8 @@ export const EssayAnalyzerWrapper = ({
 
   return (
     <EssayCreator
-      isAnalyzing={isProcessing}
-      onCreated={(submissionId?: string) => {
-        console.log('EssayCreator onCreated called with submissionId:', submissionId);
-        setIsAnalyzed(true);
-        if (submissionId) {
-          setCurrentSubmissionId(submissionId);
-        }
-      }}
+      isAnalyzing={isProcessingEssay}
+      onAnalyzeEssay={handleEssayAnalysis}
       onStartNewAnalysis={clearCurrentResults}
     />
   );
