@@ -98,12 +98,12 @@ export const EssayResults = ({
   };
 
   const sentenceColors = [
-    'bg-blue-100 text-blue-800 border-blue-200',
-    'bg-green-100 text-green-800 border-green-200',
-    'bg-yellow-100 text-yellow-800 border-yellow-200',
-    'bg-purple-100 text-purple-800 border-purple-200',
-    'bg-pink-100 text-pink-800 border-pink-200',
-    'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'bg-blue-200 text-blue-900 border-2 border-blue-400 shadow-sm',
+    'bg-green-200 text-green-900 border-2 border-green-400 shadow-sm',
+    'bg-yellow-200 text-yellow-900 border-2 border-yellow-400 shadow-sm',
+    'bg-purple-200 text-purple-900 border-2 border-purple-400 shadow-sm',
+    'bg-pink-200 text-pink-900 border-2 border-pink-400 shadow-sm',
+    'bg-indigo-200 text-indigo-900 border-2 border-indigo-400 shadow-sm',
   ];
 
   const originalSplitted = useMemo(() => {

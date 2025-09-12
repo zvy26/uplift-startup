@@ -7,6 +7,7 @@ interface SentenceWrapperProps {
     text: string;
     index: number;
   };
+  dataId: string;
   isActive: boolean;
   onHover: (sentenceId: string | null) => void;
   onFocus: (sentenceId: string | null) => void;
@@ -15,6 +16,7 @@ interface SentenceWrapperProps {
 
 export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
   sentence,
+  dataId,
   isActive,
   onHover,
   onFocus,
@@ -24,10 +26,20 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
   const activeColors = getActiveSentenceColor(sentence.index);
   
   const handleMouseEnter = () => {
+    // Highlight all elements with the same data-id
+    const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
+    elements.forEach(el => {
+      el.classList.add('sentence-highlighted');
+    });
     onHover(sentence.id);
   };
   
   const handleMouseLeave = () => {
+    // Remove highlight from all elements with the same data-id
+    const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
+    elements.forEach(el => {
+      el.classList.remove('sentence-highlighted');
+    });
     onHover(null);
   };
   
@@ -41,8 +53,9 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
   
   return (
     <span
+      data-sentence-id={dataId}
       className={`
-        inline-block px-1 py-0.5 rounded transition-all duration-200 cursor-pointer
+        inline-block px-2 py-1 rounded-md transition-all duration-300 cursor-pointer
         ${isActive ? activeColors : baseColors}
         ${className}
       `}

@@ -77,6 +77,7 @@ export const createSentenceMapping = (
 
 /**
  * Get the corresponding sentence ID for cross-panel highlighting
+ * This function maps sentences by their position (index) within the same paragraph type
  */
 export const getCorrespondingSentenceId = (
   sentenceId: string,
@@ -91,18 +92,20 @@ export const getCorrespondingSentenceId = (
   const targetType = isOriginal ? 'improved' : 'original';
   
   // Extract the paragraph type and name from paragraphId
-  const paragraphType = paragraphId.includes('intro') ? 'intro' :
-                       paragraphId.includes('body') ? 'body' :
-                       paragraphId.includes('conclusion') ? 'conclusion' : '';
-  
-  // Extract body paragraph number if it's a body paragraph
+  let paragraphType = '';
   let bodyNumber = '';
-  if (paragraphType === 'body') {
+  
+  if (paragraphId.includes('intro')) {
+    paragraphType = 'intro';
+  } else if (paragraphId.includes('conclusion')) {
+    paragraphType = 'conclusion';
+  } else if (paragraphId.includes('body')) {
+    paragraphType = 'body';
     const bodyMatch = paragraphId.match(/body-(\d+)/);
     bodyNumber = bodyMatch ? bodyMatch[1] : '';
   }
   
-  // Construct the corresponding sentence ID
+  // Construct the corresponding sentence ID with the same sentence index
   const targetParagraphId = `${targetType}-${paragraphType}${bodyNumber}`;
   return `${targetParagraphId}-sentence-${sentenceIndex}`;
 };
@@ -120,14 +123,14 @@ const extractSentenceIndex = (sentenceId: string): number => {
  */
 export const getSentenceColors = (index: number): string => {
   const colors = [
-    'bg-blue-50 hover:bg-blue-100 border-blue-200',
-    'bg-green-50 hover:bg-green-100 border-green-200',
-    'bg-yellow-50 hover:bg-yellow-100 border-yellow-200',
-    'bg-purple-50 hover:bg-purple-100 border-purple-200',
-    'bg-pink-50 hover:bg-pink-100 border-pink-200',
-    'bg-indigo-50 hover:bg-indigo-100 border-indigo-200',
-    'bg-orange-50 hover:bg-orange-100 border-orange-200',
-    'bg-teal-50 hover:bg-teal-100 border-teal-200',
+    'bg-blue-200 hover:bg-blue-300 border-2 border-blue-400 text-blue-900 shadow-sm',
+    'bg-green-200 hover:bg-green-300 border-2 border-green-400 text-green-900 shadow-sm',
+    'bg-yellow-200 hover:bg-yellow-300 border-2 border-yellow-400 text-yellow-900 shadow-sm',
+    'bg-purple-200 hover:bg-purple-300 border-2 border-purple-400 text-purple-900 shadow-sm',
+    'bg-pink-200 hover:bg-pink-300 border-2 border-pink-400 text-pink-900 shadow-sm',
+    'bg-indigo-200 hover:bg-indigo-300 border-2 border-indigo-400 text-indigo-900 shadow-sm',
+    'bg-orange-200 hover:bg-orange-300 border-2 border-orange-400 text-orange-900 shadow-sm',
+    'bg-teal-200 hover:bg-teal-300 border-2 border-teal-400 text-teal-900 shadow-sm',
   ];
   
   return colors[index % colors.length];
@@ -138,14 +141,14 @@ export const getSentenceColors = (index: number): string => {
  */
 export const getActiveSentenceColor = (index: number): string => {
   const colors = [
-    'bg-blue-100 border-blue-300',
-    'bg-green-100 border-green-300',
-    'bg-yellow-100 border-yellow-300',
-    'bg-purple-100 border-purple-300',
-    'bg-pink-100 border-pink-300',
-    'bg-indigo-100 border-indigo-300',
-    'bg-orange-100 border-orange-300',
-    'bg-teal-100 border-teal-300',
+    'bg-blue-500 border-4 border-blue-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-green-500 border-4 border-green-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-yellow-500 border-4 border-yellow-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-purple-500 border-4 border-purple-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-pink-500 border-4 border-pink-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-indigo-500 border-4 border-indigo-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-orange-500 border-4 border-orange-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-teal-500 border-4 border-teal-700 text-white shadow-xl transform scale-110 font-bold',
   ];
   
   return colors[index % colors.length];

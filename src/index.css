@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cross-panel sentence highlighting */
+.sentence-highlighted {
+  @apply bg-blue-400 border border-blue-600 text-white shadow-lg transform scale-105 font-semibold;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

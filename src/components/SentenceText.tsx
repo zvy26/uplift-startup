@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { parseSentences, getCorrespondingSentenceId } from '@/lib/sentenceUtils';
+import { parseSentences } from '@/lib/sentenceUtils';
 import { SentenceWrapper } from './SentenceWrapper';
 
 interface SentenceTextProps {
@@ -30,25 +30,23 @@ export const SentenceText: React.FC<SentenceTextProps> = ({
   return (
     <span className={className}>
       {sentences.map((sentence, index) => {
-        const sentenceId = `${paragraphId}-${sentence.id}`;
+        // Create a unique data-id that will be the same for corresponding sentences
+        // Format: paragraphType-sentenceIndex (e.g., "intro-0", "body1-1", "conclusion-0")
+        const paragraphType = paragraphId.includes('intro') ? 'intro' :
+                             paragraphId.includes('conclusion') ? 'conclusion' :
+                             paragraphId.includes('body') ? paragraphId.match(/body-(\d+)/)?.[1] ? `body${paragraphId.match(/body-(\d+)/)?.[1]}` : 'body' : 'unknown';
         
-        // Check if this sentence should be highlighted
-        const isActive = activeSentenceId === sentenceId;
-        
-        // Check if this sentence should be highlighted due to cross-panel highlighting
-        const isCurrentOriginal = paragraphId.includes('original-');
-        const correspondingSentenceId = activeSentenceId ? 
-          getCorrespondingSentenceId(activeSentenceId, paragraphId, isCurrentOriginal) : null;
-        const isCrossHighlighted = correspondingSentenceId === sentenceId;
+        const dataId = `${paragraphType}-${sentence.index}`;
         
         return (
-          <React.Fragment key={sentenceId}>
+          <React.Fragment key={`${paragraphId}-${sentence.id}`}>
             <SentenceWrapper
               sentence={{
                 ...sentence,
-                id: sentenceId
+                id: `${paragraphId}-${sentence.id}`
               }}
-              isActive={isActive || isCrossHighlighted}
+              dataId={dataId}
+              isActive={activeSentenceId === `${paragraphId}-${sentence.id}`}
               onHover={onSentenceHover}
               onFocus={onSentenceFocus}
             />
