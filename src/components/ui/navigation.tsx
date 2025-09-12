@@ -15,7 +15,7 @@ export const Navigation = () => {
 
   const navItems = [
     { href: '/ielts-writing', label: 'Checker' },
-    { href: '/my-submissions', label: 'My Submissions' },
+    ...(authenticated ? [{ href: '/my-submissions', label: 'My Submissions' }] : []),
     { href: '/pricing', label: 'Pricing' },
     { href: '/rubrics', label: 'Rubrics' },
     { href: '/about', label: 'About' },

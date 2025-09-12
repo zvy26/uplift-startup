@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL || 'https://dead.uz/api2',
   withCredentials: true,
 });
 
@@ -21,6 +21,16 @@ http.interceptors.response.use(
     return config;
   },
   (error) => {
+    // Enhanced error logging for debugging
+    console.error('API Error:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method,
+    });
+
     // Do not indiscriminately clear storage on 401.
     // 401s can occur for many reasons (e.g., race conditions, background fetches).
     // Let feature code decide how to react, and keep tokens intact.

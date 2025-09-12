@@ -77,6 +77,26 @@ export const EssayResults = ({
   console.log(bandVersions);
   const { toast } = useToast();
 
+  // Function to format improved text and remove generic responses
+  const formatImprovedText = (text: string) => {
+    if (!text) return '';
+    
+    // Remove generic responses that don't provide actual content
+    const genericResponses = [
+      'This introduction demonstrates exceptional clarity and sophistication in presenting the argument.',
+      'This paragraph showcases advanced critical thinking and sophisticated argumentation with excellent examples.',
+      'This paragraph demonstrates mastery of complex ideas with flawless expression and coherence.',
+      'This conclusion provides exceptional synthesis and leaves a lasting impression.'
+    ];
+    
+    // If the text is a generic response, return a placeholder
+    if (genericResponses.includes(text.trim())) {
+      return 'Content will be generated here...';
+    }
+    
+    return text;
+  };
+
   const sentenceColors = [
     'bg-blue-100 text-blue-800 border-blue-200',
     'bg-green-100 text-green-800 border-green-200',
@@ -464,7 +484,7 @@ export const EssayResults = ({
                       <h4 className="font-semibold mb-2 text-blue-800">Introduction</h4>
                       <div className="text-gray-700">
                         <SentenceText
-                          text={selectedVersion.sections.introduction}
+                          text={formatImprovedText(selectedVersion.sections.introduction)}
                           paragraphId="improved-intro"
                           activeSentenceId={hoveredSentence}
                           onSentenceHover={setHoveredSentence}
@@ -500,7 +520,7 @@ export const EssayResults = ({
                             </h4>
                             <div className="text-gray-700">
                               <SentenceText
-                                text={bodyParagraph}
+                                text={formatImprovedText(bodyParagraph)}
                                 paragraphId={`improved-body-${index + 1}`}
                                 activeSentenceId={hoveredSentence}
                                 onSentenceHover={setHoveredSentence}
@@ -521,7 +541,7 @@ export const EssayResults = ({
                           <h4 className="font-semibold mb-2 text-green-800">Conclusion</h4>
                           <div className="text-gray-700">
                             <SentenceText
-                              text={selectedVersion.sections.conclusion}
+                              text={formatImprovedText(selectedVersion.sections.conclusion)}
                               paragraphId="improved-conclusion"
                               activeSentenceId={hoveredSentence}
                               onSentenceHover={setHoveredSentence}

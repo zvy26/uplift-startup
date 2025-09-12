@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useRouter } from "@/hooks/useRouter";
 import { paths } from "@/routes/paths";
 
 import { useAuthContext } from "../hooks/useAuthContext";
@@ -20,7 +20,7 @@ export function AuthGuard({ children }: Props) {
 }
 
 function Container({ children }: Props) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const { authenticated, method } = useAuthContext();
 
@@ -36,11 +36,11 @@ function Container({ children }: Props) {
 
       const href = `${loginPath}?${searchParams}`;
 
-      router.replace(href);
+      navigate(href, { replace: true });
     } else {
       setChecked(true);
     }
-  }, [authenticated, method, router]);
+  }, [authenticated, method, navigate]);
 
   useEffect(() => {
     check();

@@ -1,9 +1,8 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 
 import React, { useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { useRouter } from "@/hooks/useRouter";
-import { useSearchParams } from "@/hooks/useSearchParams";
 import { paths } from "@/routes/paths";
 
 import { useAuthContext } from "../hooks/useAuthContext";
@@ -19,9 +18,9 @@ export function GuestGuard({ children }: Props) {
 }
 
 function Container({ children }: Props) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const returnTo = searchParams.get("returnTo") || paths.dashboard.root;
 
@@ -29,9 +28,9 @@ function Container({ children }: Props) {
 
   const check = useCallback(() => {
     if (authenticated) {
-      router.replace(returnTo);
+      navigate(returnTo, { replace: true });
     }
-  }, [authenticated, returnTo, router]);
+  }, [authenticated, returnTo, navigate]);
 
   useEffect(() => {
     check();
