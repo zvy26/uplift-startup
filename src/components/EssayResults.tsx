@@ -214,15 +214,15 @@ export const EssayResults = ({
   };
 
   return (
-    <div className="min-h-screen px-2 lg:px-4 py-2 space-y-6 max-w-none">
-      <div className="grid lg:grid-cols-2 gap-6 items-start">
+    <div className="min-h-screen px-1 sm:px-2 lg:px-4 py-2 space-y-4 sm:space-y-6 max-w-none">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
         {/* Original Essay */}
         <Card className="shadow-medium">
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">Original Essay</h3>
-                <Badge className="bg-green-100 text-green-800 border-green-200 px-4 py-[6px] text-base font-semibold">
+                <h3 className="text-lg sm:text-xl font-semibold">Original Essay</h3>
+                <Badge className="bg-green-100 text-green-800 border-green-200 px-2 sm:px-4 py-[4px] sm:py-[6px] text-sm sm:text-base font-semibold">
                   {latestSubmission.score.toFixed(1)} Band
                 </Badge>
               </div>
@@ -415,7 +415,7 @@ export const EssayResults = ({
         <Card className="shadow-medium">
           <CardHeader>
             <div className="flex items-center gap-5">
-              <h2 className="text-xl font-semibold">Improved Version</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Improved Version</h2>
               <div className="flex gap-2">
                 {bandVersions.map(version => (
                   <Button
@@ -425,7 +425,7 @@ export const EssayResults = ({
                     }
                     size="sm"
                     onClick={() => setSelectedBand(version.band)}
-                    className={
+                    className={`text-xs sm:text-sm ${
                       selectedBand === version.band
                         ? version.band === 7
                           ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
@@ -433,7 +433,7 @@ export const EssayResults = ({
                           ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
                           : 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200'
                         : ''
-                    }
+                    }`}
                   >
                     Band {version.band}
                   </Button>
@@ -442,7 +442,7 @@ export const EssayResults = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-9 h-9"
+                  className="w-8 h-8 sm:w-9 sm:h-9"
                   onClick={() =>
                     copyToClipboard(
                       selectedVersion?.sections
@@ -457,20 +457,20 @@ export const EssayResults = ({
                     )
                   }
                 >
-                  <Copy className="h-4 w-4" />
+                  <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-9 h-9"
+                  className="w-8 h-8 sm:w-9 sm:h-9"
                   onClick={generatePDF}
                 >
-                  <DownloadIcon className="h-4 w-4" />
+                  <DownloadIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-6">
             <div className="space-y-4">
 
               {/* Improved Version Display */}

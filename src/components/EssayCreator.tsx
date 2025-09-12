@@ -318,7 +318,7 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
         {/* Analysis Results */}
         <Card className="shadow-medium">
           <CardHeader>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 flex-col md:flex-row">
               <h2 className="text-xl font-semibold">Improved Version</h2>
               <div className="flex gap-2">
                 <Button

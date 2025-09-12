@@ -13,6 +13,7 @@ import {
 import { Plan, useCreateOrderPayme } from '@/modules/plan';
 import { useCreateOrderClick } from '@/modules/plan/hooks/usePlans';
 import { useGetPlans } from '@/services/planQueries';
+import { useGetTrial } from '@/components/hooks/useGetTrial';
 import { Check, Crown, Star, CreditCard, Smartphone } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +22,7 @@ import { Click, Payme } from '@/assets/Payme';
 const Pricing = () => {
   const { data, isLoading } = useGetPlans();
   const { user } = useAuthContext();
+  const { data: userPlanData } = useGetTrial();
   const navigate = useNavigate();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
@@ -57,6 +59,11 @@ const Pricing = () => {
   }
 
   const handleGetPremium = (plan: Plan) => {
+    // Don't show payment dialog for free plans
+    if (plan.price === 0) {
+      return;
+    }
+    
     if (!user) {
       navigate('/auth/login');
       return;
@@ -79,21 +86,31 @@ const Pricing = () => {
     }
   };
 
-  const plans = plansData.map((plan) => ({
-    id: plan._id,
-    name: plan.title,
-    price: plan.price === 0 ? 'Free' : plan.price,
-    period: plan.price === 0 ? '' : plan.currency,
-    description: plan.description,
-    icon: plan.type === 'FREE' ? <Star className="h-6 w-6" /> : <Crown className="h-6 w-6" />,
-    features: plan.features,
-    buttonText: plan.price === 0 ? 'Current Plan' : 'Get Premium',
-    variant: plan.price === 0 ? 'outline' as const : 'default' as const,
-    popular: plan.isPopular,
-    current: plan.price === 0, // Assuming free plan is current
-    isLoading: (isPending && variables === plan._id) || (isPendingClick && variablesClick === plan._id),
-    plan: plan, // Keep reference to original plan data
-  }));
+  const plans = plansData.map((plan) => {
+    // Check if this plan is the user's current plan
+    const isCurrentPlan = userPlanData ? 
+      (plan.title === userPlanData.plan) : 
+      (plan.price === 0); // If no user data, freemium is default current plan
+    
+    // Freemium plans are always available and don't need "Get Premium"
+    const isFreemium = plan.price === 0;
+    
+    return {
+      id: plan._id,
+      name: plan.title,
+      price: plan.price === 0 ? 'Free' : plan.price,
+      period: plan.price === 0 ? '' : plan.currency,
+      description: plan.description,
+      icon: plan.type === 'FREE' ? <Star className="h-6 w-6" /> : <Crown className="h-6 w-6" />,
+      features: plan.features,
+      buttonText: isCurrentPlan ? 'Current Plan' : (isFreemium ? 'Available' : 'Get Premium'),
+      variant: isCurrentPlan ? 'outline' as const : (isFreemium ? 'secondary' as const : 'default' as const),
+      popular: plan.isPopular,
+      current: isCurrentPlan,
+      isLoading: (isPending && variables === plan._id) || (isPendingClick && variablesClick === plan._id),
+      plan: plan, // Keep reference to original plan data
+    };
+  });
 
 
   return (
@@ -207,7 +224,7 @@ const Pricing = () => {
                         ? 'bg-green-500 hover:bg-green-600 text-white'
                         : ''
                     } ${plan.current ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    disabled={plan.current || plan.isLoading}
+                    disabled={plan.current || plan.isLoading || plan.plan.price === 0}
                     onClick={() => handleGetPremium(plan.plan)}
                   >
                     {plan.isLoading ? 'Loading...' : plan.buttonText}

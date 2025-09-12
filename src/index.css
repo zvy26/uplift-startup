@@ -4,7 +4,12 @@
 
 /* Cross-panel sentence highlighting */
 .sentence-highlighted {
-  @apply bg-blue-400 border border-blue-600 text-white shadow-lg transform scale-105 font-semibold;
+  @apply bg-blue-200 border border-blue-400 text-blue-900 shadow-md;
+}
+
+/* Ensure all highlighted sentences use the same color */
+.sentence-highlighted[data-sentence-id] {
+  @apply bg-blue-200 border border-blue-400 text-blue-900 shadow-md;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 

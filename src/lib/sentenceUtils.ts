@@ -123,14 +123,14 @@ const extractSentenceIndex = (sentenceId: string): number => {
  */
 export const getSentenceColors = (index: number): string => {
   const colors = [
-    'bg-blue-200 hover:bg-blue-300 border-2 border-blue-400 text-blue-900 shadow-sm',
-    'bg-green-200 hover:bg-green-300 border-2 border-green-400 text-green-900 shadow-sm',
-    'bg-yellow-200 hover:bg-yellow-300 border-2 border-yellow-400 text-yellow-900 shadow-sm',
-    'bg-purple-200 hover:bg-purple-300 border-2 border-purple-400 text-purple-900 shadow-sm',
-    'bg-pink-200 hover:bg-pink-300 border-2 border-pink-400 text-pink-900 shadow-sm',
-    'bg-indigo-200 hover:bg-indigo-300 border-2 border-indigo-400 text-indigo-900 shadow-sm',
-    'bg-orange-200 hover:bg-orange-300 border-2 border-orange-400 text-orange-900 shadow-sm',
-    'bg-teal-200 hover:bg-teal-300 border-2 border-teal-400 text-teal-900 shadow-sm',
+    'bg-gray-50 hover:bg-blue-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-green-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-yellow-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-purple-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-pink-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-indigo-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-orange-100 border border-gray-200 text-gray-700',
+    'bg-gray-50 hover:bg-teal-100 border border-gray-200 text-gray-700',
   ];
   
   return colors[index % colors.length];
@@ -141,14 +141,14 @@ export const getSentenceColors = (index: number): string => {
  */
 export const getActiveSentenceColor = (index: number): string => {
   const colors = [
-    'bg-blue-500 border-4 border-blue-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-green-500 border-4 border-green-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-yellow-500 border-4 border-yellow-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-purple-500 border-4 border-purple-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-pink-500 border-4 border-pink-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-indigo-500 border-4 border-indigo-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-orange-500 border-4 border-orange-700 text-white shadow-xl transform scale-110 font-bold',
-    'bg-teal-500 border-4 border-teal-700 text-white shadow-xl transform scale-110 font-bold',
+    'bg-blue-100 border border-blue-300 text-blue-900',
+    'bg-green-100 border border-green-300 text-green-900',
+    'bg-yellow-100 border border-yellow-300 text-yellow-900',
+    'bg-purple-100 border border-purple-300 text-purple-900',
+    'bg-pink-100 border border-pink-300 text-pink-900',
+    'bg-indigo-100 border border-indigo-300 text-indigo-900',
+    'bg-orange-100 border border-orange-300 text-orange-900',
+    'bg-teal-100 border border-teal-300 text-teal-900',
   ];
   
   return colors[index % colors.length];
