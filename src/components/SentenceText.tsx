@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { parseSentences } from '@/lib/sentenceUtils';
 import { SentenceWrapper } from './SentenceWrapper';
 
@@ -11,7 +11,7 @@ interface SentenceTextProps {
   className?: string;
 }
 
-export const SentenceText: React.FC<SentenceTextProps> = ({
+export const SentenceText: React.FC<SentenceTextProps> = memo(({
   text,
   paragraphId,
   activeSentenceId,
@@ -56,5 +56,5 @@ export const SentenceText: React.FC<SentenceTextProps> = ({
       })}
     </span>
   );
-};
+});
 

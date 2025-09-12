@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import { getSentenceColors, getActiveSentenceColor } from '@/lib/sentenceUtils';
 
 interface SentenceWrapperProps {
@@ -14,7 +14,7 @@ interface SentenceWrapperProps {
   className?: string;
 }
 
-export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
+export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
   sentence,
   dataId,
   isActive,
@@ -25,31 +25,44 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
   const baseColors = getSentenceColors(sentence.index);
   const activeColors = getActiveSentenceColor(sentence.index);
   
-  const handleMouseEnter = () => {
-    // Highlight all elements with the same data-id
-    const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
-    elements.forEach(el => {
-      el.classList.add('sentence-highlighted');
+  const handleMouseEnter = useCallback(() => {
+    // Use requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
+      const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
+      elements.forEach(el => {
+        el.classList.add('sentence-highlighted');
+      });
     });
     onHover(sentence.id);
-  };
+  }, [dataId, onHover, sentence.id]);
   
-  const handleMouseLeave = () => {
-    // Remove highlight from all elements with the same data-id
-    const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
-    elements.forEach(el => {
-      el.classList.remove('sentence-highlighted');
+  const handleMouseLeave = useCallback(() => {
+    // Use requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
+      const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
+      elements.forEach(el => {
+        el.classList.remove('sentence-highlighted');
+      });
     });
     onHover(null);
-  };
+  }, [dataId, onHover]);
   
-  const handleFocus = () => {
+  const handleFocus = useCallback(() => {
     onFocus(sentence.id);
-  };
+  }, [onFocus, sentence.id]);
   
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     onFocus(null);
-  };
+  }, [onFocus]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleMouseEnter();
+    } else if (e.key === 'Escape') {
+      handleMouseLeave();
+    }
+  }, [handleMouseEnter, handleMouseLeave]);
   
   return (
     <span
@@ -63,11 +76,13 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = ({
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      aria-label={`Sentence ${sentence.index + 1}`}
+      aria-label={`Sentence ${sentence.index + 1}: ${sentence.text.substring(0, 50)}${sentence.text.length > 50 ? '...' : ''}`}
+      aria-describedby={`sentence-${sentence.id}-description`}
     >
       {sentence.text}
     </span>
   );
-};
+});

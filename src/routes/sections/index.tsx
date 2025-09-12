@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import {
   createBrowserRouter,
-  Navigate,
   RouterProvider,
 } from 'react-router-dom';
 
@@ -14,7 +13,6 @@ import { exposed } from './exposed';
 
 export const Router = () => {
   const { authenticated, unauthenticated, loading } = useAuthContext();
-  console.log('authenticated', authenticated);
 
   const routes = [
     ...exposed,

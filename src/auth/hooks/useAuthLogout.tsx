@@ -14,7 +14,6 @@ export const useAuthLogout = () => {
         await http.post(endpoints.auth.logout);
       } catch (apiError) {
         // If the logout endpoint doesn't exist (404), just continue with local logout
-        console.log('Logout endpoint not available, proceeding with local logout');
       }
 
       // Always perform local logout regardless of API response

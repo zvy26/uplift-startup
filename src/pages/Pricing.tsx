@@ -79,7 +79,6 @@ const Pricing = () => {
     }
   };
 
-  // Transform API data to display format
   const plans = plansData.map((plan) => ({
     id: plan._id,
     name: plan.title,
@@ -96,7 +95,6 @@ const Pricing = () => {
     plan: plan, // Keep reference to original plan data
   }));
 
-  console.log('user', user);
 
   return (
     <div className="min-h-screen bg-background">

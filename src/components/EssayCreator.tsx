@@ -185,9 +185,7 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
     }
 
     try {
-      console.log('Calling onAnalyzeEssay with data:', submissionData);
       await onAnalyzeEssay(submissionData);
-      console.log('Essay analysis completed successfully');
     } catch (error) {
       console.error('Error analyzing essay:', error);
       

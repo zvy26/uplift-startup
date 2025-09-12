@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +74,6 @@ export const EssayResults = ({
   options,
   setOptions,
 }: EssayResultsProps) => {
-  console.log(bandVersions);
   const { toast } = useToast();
 
   // Function to format improved text and remove generic responses
@@ -110,6 +109,10 @@ export const EssayResults = ({
     if (!latestSubmission?.body) return [];
     return latestSubmission.body.split('\n').filter(Boolean);
   }, [latestSubmission?.body]);
+
+  const selectedVersion = useMemo(() => {
+    return bandVersions.find(v => v.band === selectedBand);
+  }, [bandVersions, selectedBand]);
 
   if (!latestSubmission) return null;
 
@@ -209,12 +212,6 @@ export const EssayResults = ({
       description: 'The improved essay has been copied to your clipboard.',
     });
   };
-
-  const selectedVersion = bandVersions.find(v => v.band === selectedBand);
-  console.log('EssayResults - bandVersions:', bandVersions);
-  console.log('EssayResults - selectedBand:', selectedBand);
-  console.log('EssayResults - selectedVersion:', selectedVersion);
-  console.log('EssayResults - latestSubmission:', latestSubmission);
 
   return (
     <div className="min-h-screen px-2 lg:px-4 py-2 space-y-6 max-w-none">

@@ -82,18 +82,14 @@ export const EssayAnalyzerWrapper = ({
   const handleEssayAnalysis = async (submissionData: SendSubmission) => {
     try {
       setIsProcessingEssay(true);
-      console.log('Starting essay analysis with data:', submissionData);
       
       // First submit the essay
       const response = await submitEssayMutation.mutateAsync(submissionData);
-      console.log('Submission response:', response);
       
       // Extract submission ID from response
       const submissionId = response?.data?._id ?? response?._id ?? response?.data?.id ?? response?.id;
-      console.log('Extracted submission ID:', submissionId);
 
       if (submissionId) {
-        console.log('Triggering analysis for submission ID:', submissionId);
         setCurrentSubmissionId(submissionId);
         
         // Add a small delay to ensure submission is fully processed
@@ -102,11 +98,9 @@ export const EssayAnalyzerWrapper = ({
         // Then trigger analysis
         await analyzeSubmissionMutation.mutateAsync(submissionId);
         
-        console.log('Analysis completed successfully');
         setIsAnalyzed(true);
         
         // Force a refetch of the submission data
-        console.log('Forcing refetch of submission data for ID:', submissionId);
         await refetchSpecificSubmission();
         
         // Don't set isProcessingEssay to false here - let shouldShowProcessing logic handle it
@@ -254,26 +248,11 @@ export const EssayAnalyzerWrapper = ({
 
   // Handle latest submission data - only show results for current submission
   useEffect(() => {
-    console.log('EssayAnalyzerWrapper useEffect triggered:', {
-      activeSubmission: activeSubmission ? { 
-        id: activeSubmission._id, 
-        status: activeSubmission.status,
-        hasAiFeedback: !!activeSubmission.aiFeedback,
-        hasImprovedVersions: !!activeSubmission.aiFeedback?.improvedVersions,
-        improvedVersionsKeys: activeSubmission.aiFeedback?.improvedVersions ? Object.keys(activeSubmission.aiFeedback.improvedVersions) : []
-      } : null,
-      currentSubmissionId,
-      submissionId,
-      hasAiFeedback: !!activeSubmission?.aiFeedback,
-      hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions
-    });
-    
     if (activeSubmission && activeSubmission.aiFeedback?.improvedVersions && (submissionId || currentSubmissionId)) {
       setHasAnalyzed(true);
 
       // Convert API data to UiBandVersion format
       if (activeSubmission.aiFeedback?.improvedVersions) {
-        console.log('Processing AI feedback:', activeSubmission.aiFeedback);
         const versions: UiBandVersion[] = [];
 
         if (activeSubmission.aiFeedback.improvedVersions.band7) {
@@ -351,7 +330,6 @@ export const EssayAnalyzerWrapper = ({
           });
         }
 
-        console.log('Created versions:', versions);
         setBandVersions(versions);
 
         // Set current band based on target score
@@ -388,41 +366,6 @@ export const EssayAnalyzerWrapper = ({
       activeSubmission.status === IELTSWritingSubmissionStatus.IDLE ||
       activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED);
 
-  console.log('shouldShowResults calculation:', {
-    hasActiveSubmission: !!activeSubmission,
-    hasAiFeedback: !!activeSubmission?.aiFeedback,
-    hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions,
-    hasSubmissionId: !!(submissionId || currentSubmissionId),
-    status: activeSubmission?.status,
-    statusMatches: activeSubmission ? (
-      activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS ||
-      activeSubmission.status === IELTSWritingSubmissionStatus.IDLE ||
-      activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED
-    ) : false,
-    shouldShowResults
-  });
-
-  console.log('EssayAnalyzerWrapper Debug:', {
-    activeSubmission: activeSubmission ? { id: activeSubmission._id, status: activeSubmission.status } : null,
-    currentSubmissionId,
-    shouldShowResults,
-    shouldShowProcessing,
-    isAnalyzed,
-    isPendingAnalysed,
-    bandVersions: bandVersions.length,
-    hasAnalyzed,
-    submissionId,
-    hasAiFeedback: !!activeSubmission?.aiFeedback,
-    hasImprovedVersions: !!activeSubmission?.aiFeedback?.improvedVersions,
-    isProcessingEssay,
-    submitEssayPending: submitEssayMutation.isPending,
-    analyzePending: analyzeSubmissionMutation.isPending,
-    statusCheck: activeSubmission ? {
-      isInProgress: activeSubmission.status === IELTSWritingSubmissionStatus.IN_PROGRESS,
-      isIdle: activeSubmission.status === IELTSWritingSubmissionStatus.IDLE,
-      isAnalyzed: activeSubmission.status === IELTSWritingSubmissionStatus.ANALYZED
-    } : null
-  });
 
   // Show loading state when fetching specific submission (only for URL-based submissions)
   if (isLoadingSubmission && submissionId) {
