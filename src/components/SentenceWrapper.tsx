@@ -14,7 +14,6 @@ interface SentenceWrapperProps {
   className?: string;
 }
 
-// Global state for cross-panel highlighting
 let globalHoveredDataId: string | null = null;
 const hoverListeners: Set<(dataId: string | null) => void> = new Set();
 
@@ -35,7 +34,6 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
   const activeColors = getActiveSentenceColor(sentence.index);
   const [isGloballyHovered, setIsGloballyHovered] = useState(false);
   
-  // Listen for global hover changes
   useEffect(() => {
     const listener = (hoveredDataId: string | null) => {
       setIsGloballyHovered(hoveredDataId === dataId);
@@ -43,7 +41,6 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
     
     hoverListeners.add(listener);
     
-    // Set initial state
     setIsGloballyHovered(globalHoveredDataId === dataId);
     
     return () => {
@@ -78,7 +75,6 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
     }
   }, [handleMouseEnter, handleMouseLeave]);
   
-  // Determine the current styling
   const currentColors = isGloballyHovered 
     ? getHighlightColor(sentence.index)
     : (isActive ? activeColors : baseColors);

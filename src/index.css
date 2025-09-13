@@ -2,13 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Cross-panel sentence highlighting - colors are applied dynamically via JavaScript */
 .sentence-highlighted {
-  /* Base highlight styles - specific colors are applied via className manipulation */
   @apply shadow-md transition-all duration-200;
 }
 
-/* OTP Input animations */
 @keyframes caret-blink {
   0%, 70%, 100% {
     opacity: 1;

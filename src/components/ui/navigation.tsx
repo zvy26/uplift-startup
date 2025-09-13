@@ -25,7 +25,6 @@ export const Navigation = () => {
     <nav className="bg-card border-b border-border shadow-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Logo size="md" variant="icon" />
             <span className="text-xl font-bold text-foreground">
@@ -33,7 +32,6 @@ export const Navigation = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map(item => (
               <Link
@@ -49,7 +47,6 @@ export const Navigation = () => {
               </Link>
             ))}
 
-            {/* Logout Button - Only show if authenticated */}
             {authenticated && (
               <Button
                 variant="outline"
@@ -63,7 +60,6 @@ export const Navigation = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="sm"
@@ -78,7 +74,6 @@ export const Navigation = () => {
           </Button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-border mt-2 pt-2 pb-4">
             <div className="flex flex-col space-y-2">
@@ -97,7 +92,6 @@ export const Navigation = () => {
                 </Link>
               ))}
 
-              {/* Mobile Logout Button - Only show if authenticated */}
               {authenticated && (
                 <Button
                   variant="outline"

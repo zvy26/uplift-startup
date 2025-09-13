@@ -61,7 +61,6 @@ interface EssayResultsProps {
   setOptions: (options: AnalysisOptions) => void;
 }
 
-// Color palette for sentence highlighting - each position gets a unique color
 const SENTENCE_COLORS = [
   'bg-blue-200 text-blue-900 border-2 border-blue-400 shadow-sm',
   'bg-green-200 text-green-900 border-2 border-green-400 shadow-sm',
@@ -73,11 +72,9 @@ const SENTENCE_COLORS = [
   'bg-teal-200 text-teal-900 border-2 border-teal-400 shadow-sm',
 ];
 
-// Function to format improved text and remove generic responses
 const formatImprovedText = (text: string) => {
   if (!text) return '';
   
-  // Remove generic responses that don't provide actual content
   const genericResponses = [
     'This introduction demonstrates exceptional clarity and sophistication in presenting the argument.',
     'This paragraph showcases advanced critical thinking and sophisticated argumentation with excellent examples.',
@@ -85,7 +82,6 @@ const formatImprovedText = (text: string) => {
     'This conclusion provides exceptional synthesis and leaves a lasting impression.'
   ];
   
-  // If the text is a generic response, return a placeholder
   if (genericResponses.includes(text.trim())) {
     return 'Content will be generated here...';
   }
@@ -93,7 +89,6 @@ const formatImprovedText = (text: string) => {
   return text;
 };
 
-// IELTS criteria definitions
 const getIELTSCriteria = (band: number) => {
   const criteria = {
     7: {
@@ -172,7 +167,6 @@ export const EssayResults = ({
       yPos += splitText.length * (fontSize * 0.4) + 5;
     };
 
-    // Title
     addWrappedText('IELTS Writing Task 2 Analysis', 16, true);
     yPos += 10;
 
@@ -183,7 +177,6 @@ export const EssayResults = ({
     );
     yPos += 10;
 
-    // Improved version
     addWrappedText(`Band ${selectedVersion.band} Improved Version:`, 14, true);
     yPos += 5;
 
@@ -191,14 +184,12 @@ export const EssayResults = ({
     addWrappedText(selectedVersion.sections.introduction, 12);
     yPos += 5;
 
-    // Add body paragraphs
     selectedVersion.sections.body.forEach((bodyParagraph, index) => {
       addWrappedText(`Body Paragraph ${index + 1}:`, 12, true);
       addWrappedText(bodyParagraph, 12);
       yPos += 5;
     });
 
-    // Add conclusion if it exists
     if (selectedVersion.sections.conclusion) {
       addWrappedText('Conclusion:', 12, true);
       addWrappedText(selectedVersion.sections.conclusion, 12);
@@ -219,7 +210,6 @@ export const EssayResults = ({
   return (
     <div className="min-h-screen px-1 sm:px-2 lg:px-4 py-2 space-y-4 sm:space-y-6 max-w-none">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
-        {/* Original Essay */}
         <Card className="shadow-medium">
           <CardContent className="p-3 sm:p-6">
             <div className="space-y-4">
@@ -414,7 +404,6 @@ export const EssayResults = ({
           </CardContent>
         </Card>
 
-        {/* Analysis Results */}
         <Card className="shadow-medium">
           <CardHeader>
             <div className="flex items-center gap-5">
@@ -476,7 +465,6 @@ export const EssayResults = ({
           <CardContent className="p-3 sm:p-6">
             <div className="space-y-4">
 
-              {/* Improved Version Display */}
               {selectedVersion && (
                 <div className="space-y-4">
                   <div className="space-y-4">
@@ -553,7 +541,6 @@ export const EssayResults = ({
                     )}
                   </div>
 
-                  {/* IELTS Criteria Buttons */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm font-medium">
                       <Lightbulb className="h-4 w-4 text-accent" />

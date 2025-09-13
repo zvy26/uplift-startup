@@ -59,7 +59,6 @@ const Pricing = () => {
   }
 
   const handleGetPremium = (plan: Plan) => {
-    // Don't show payment dialog for free plans
     if (plan.price === 0) {
       return;
     }
@@ -87,12 +86,10 @@ const Pricing = () => {
   };
 
   const plans = plansData.map((plan) => {
-    // Check if this plan is the user's current plan
     const isCurrentPlan = userPlanData ? 
       (plan.title === userPlanData.plan) : 
       (plan.price === 0); // If no user data, freemium is default current plan
     
-    // Freemium plans are always available and don't need "Get Premium"
     const isFreemium = plan.price === 0;
     
     return {
@@ -119,7 +116,6 @@ const Pricing = () => {
 
       <main className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
           <div className="text-center space-y-6 mb-16">
             <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent">
               IELTS Band Uplift - AI-Powered Essay Improvement for Band 7, 8 & 9
@@ -130,7 +126,6 @@ const Pricing = () => {
             </p>
           </div>
 
-          {/* Pricing Cards */}
           <div className="flex flex-col md:flex-row md:[&>*]:w-[33%] justify-center gap-8 max-w-6xl mx-auto">
             {plans.map(plan => (
               <Card

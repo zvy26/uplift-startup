@@ -65,7 +65,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
   const [topic, setTopic] = useState('');
   const [selectedTopicId, setSelectedTopicId] = useState('');
 
-  // Load saved essay data on component mount
   useEffect(() => {
     const savedData = getEssayFromStorage();
     if (savedData) {
@@ -77,7 +76,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
     }
   }, []);
 
-  // Save essay data to localStorage whenever it changes (for non-authenticated users)
   useEffect(() => {
     if (!authenticated && (essay.trim() || topic || customTopic)) {
       saveEssayToStorage({
@@ -122,7 +120,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
   };
 
   const analyzeEssay = async () => {
-    // Clear previous results when starting new analysis
     if (onStartNewAnalysis) {
       onStartNewAnalysis();
     }
@@ -142,7 +139,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
       return;
     }
 
-    // If user is not authenticated, save essay and redirect to login
     if (!authenticated) {
       saveEssayToStorage({
         essay,
@@ -159,7 +155,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
       return;
     }
 
-    // Check if authenticated user can analyze
     if (!finalCanAnalyze) {
       toast.error('You have reached the maximum number of essay checks.');
       return;
@@ -196,7 +191,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
     if (!authenticated) {
       navigate(paths.auth.jwt.login);
     }
-    // If authenticated, the button functionality can be extended later
   };
 
   const handleGetPremium = () => {
@@ -216,11 +210,9 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
   return (
     <div className="min-h-screen px-2 lg:px-4 py-2 space-y-6 max-w-none">
       <div className="grid lg:grid-cols-2 gap-6 items-start">
-        {/* Essay Input */}
         <Card className="shadow-medium">
           <CardContent className="p-6">
             <div className="space-y-4">
-              {/* Topic Selection */}
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Essay Topic</h3>
 
@@ -307,7 +299,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
           </CardContent>
         </Card>
 
-        {/* Analysis Results */}
         <Card className="shadow-medium">
           <CardHeader>
             <div className="flex items-center gap-5 flex-col md:flex-row">
@@ -362,7 +353,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
                       : "You've used all your essay submissions. Upgrade to continue analyzing essays."}
                   </p>
 
-                  {/* Free trial progress indicator - only show for authenticated users */}
                   {authenticated && !hasPaidPlan && (
                     <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
                       <div className="flex items-center justify-between mb-2">
@@ -397,7 +387,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
                     </div>
                   )}
 
-                  {/* Premium trial progress indicator - only show for authenticated users */}
                   {authenticated && hasPaidPlan && (
                     <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
                       <div className="flex items-center justify-between mb-2">

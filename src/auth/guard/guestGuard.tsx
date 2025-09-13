@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 
 import React, { useCallback, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

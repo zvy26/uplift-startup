@@ -30,8 +30,6 @@ export const SentenceText: React.FC<SentenceTextProps> = memo(({
   return (
     <span className={className}>
       {sentences.map((sentence, index) => {
-        // Create a unique data-id that will be the same for corresponding sentences
-        // Format: paragraphType-sentenceIndex (e.g., "intro-0", "body1-1", "conclusion-0")
         let paragraphType = '';
         if (paragraphId.includes('intro')) {
           paragraphType = 'intro';

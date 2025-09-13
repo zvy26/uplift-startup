@@ -15,7 +15,6 @@ export interface Sentence {
 export const parseSentences = (text: string): Sentence[] => {
   if (!text || typeof text !== 'string') return [];
   
-  // Split on sentence endings, but preserve the punctuation
   const sentenceRegex = /[.!?]+/g;
   const sentences: Sentence[] = [];
   let lastIndex = 0;
@@ -35,7 +34,6 @@ export const parseSentences = (text: string): Sentence[] => {
     lastIndex = match.index + match[0].length;
   }
   
-  // Handle any remaining text after the last sentence ending
   const remainingText = text.slice(lastIndex).trim();
   if (remainingText) {
     sentences.push({
@@ -45,7 +43,6 @@ export const parseSentences = (text: string): Sentence[] => {
     });
   }
   
-  // If no sentences were found (no punctuation), treat the entire text as one sentence
   if (sentences.length === 0 && text.trim()) {
     sentences.push({
       id: 'sentence-0',
@@ -67,7 +64,6 @@ export const createSentenceMapping = (
 ): Map<string, string> => {
   const mapping = new Map<string, string>();
   
-  // Map sentences by their index position
   const maxLength = Math.max(originalSentences.length, improvedSentences.length);
   
   for (let i = 0; i < maxLength; i++) {
@@ -75,7 +71,6 @@ export const createSentenceMapping = (
     const improvedSentence = improvedSentences[i];
     
     if (originalSentence && improvedSentence) {
-      // Create bidirectional mapping
       mapping.set(originalSentence.id, improvedSentence.id);
       mapping.set(improvedSentence.id, originalSentence.id);
     }
@@ -93,14 +88,11 @@ export const getCorrespondingSentenceId = (
   paragraphId: string,
   isOriginal: boolean
 ): string | null => {
-  // Extract sentence index from the sentence ID
   const sentenceIndex = extractSentenceIndex(sentenceId);
   if (sentenceIndex === -1) return null;
   
-  // Determine the target paragraph type
   const targetType = isOriginal ? 'improved' : 'original';
   
-  // Extract the paragraph type and name from paragraphId
   let paragraphType = '';
   let bodyNumber = '';
   
@@ -114,7 +106,6 @@ export const getCorrespondingSentenceId = (
     bodyNumber = bodyMatch ? bodyMatch[1] : '';
   }
   
-  // Construct the corresponding sentence ID with the same sentence index
   const targetParagraphId = `${targetType}-${paragraphType}${bodyNumber}`;
   return `${targetParagraphId}-sentence-${sentenceIndex}`;
 };

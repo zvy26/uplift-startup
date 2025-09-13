@@ -9,7 +9,6 @@ const Index = () => {
   const [currentBand, setCurrentBand] = useState<number | null>(null);
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
 
-  // Animate score display when analysis completes
   useEffect(() => {
     if (currentBand !== null && hasAnalyzed) {
       let startTime: number;
@@ -19,7 +18,6 @@ const Index = () => {
         if (!startTime) startTime = timestamp;
         const progress = Math.min((timestamp - startTime) / duration, 1);
 
-        // Ease out animation
         const easeOut = 1 - Math.pow(1 - progress, 3);
         const currentScore = easeOut * currentBand;
 
@@ -40,7 +38,6 @@ const Index = () => {
 
       <main className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          {/* Hero Section */}
           <div className="text-center space-y-6">
             <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent">
               IELTS Essay Band Uplift

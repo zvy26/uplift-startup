@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { topicAPI } from '@/modules/topic/topicAPI';
 import { Topic } from '@/modules/topic/types/Topic';
 
-// Hook for getting all topics
 export const useTopics = () => {
   return useQuery({
     queryKey: ['topics'],
@@ -17,7 +16,6 @@ export const useTopics = () => {
   });
 };
 
-// Hook for getting topics by type
 export const useTopicsByType = (type: 'TASK_ONE' | 'TASK_TWO') => {
   return useQuery({
     queryKey: ['topics', type],
@@ -32,7 +30,6 @@ export const useTopicsByType = (type: 'TASK_ONE' | 'TASK_TWO') => {
   });
 };
 
-// Hook for getting a single topic by ID
 export const useTopic = (id: string) => {
   return useQuery({
     queryKey: ['topic', id],

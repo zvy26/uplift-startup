@@ -7,7 +7,6 @@ import {
 } from '@/modules/essay/types/Submission';
 import { useEffect, useState } from 'react';
 
-// Hook for submitting an essay
 export const useSubmitEssay = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -25,7 +24,6 @@ export const useSubmitEssay = () => {
   });
 };
 
-// Hook for getting all submissions
 export const useSubmissions = (enabled: boolean = true) => {
   const [isPendingAnalysed, setIsPendingAnalysed] = useState<null | boolean>(
     null
@@ -39,7 +37,6 @@ export const useSubmissions = (enabled: boolean = true) => {
     enabled,
     refetchInterval: ({ state }) => {
       const res = state.data;
-      // If the latest submission is still processing, refetch every 5 seconds
       if (res && res.length > 0) {
         const latestSubmission = res[0];
         if (
@@ -76,7 +73,6 @@ export const useSubmissions = (enabled: boolean = true) => {
   };
 };
 
-// Hook for getting the latest submission
 export const useLatestSubmission = (enabled: boolean = true) => {
   const {
     data: submissions,
@@ -98,7 +94,6 @@ export const useLatestSubmission = (enabled: boolean = true) => {
   };
 };
 
-// Hook for getting a specific submission by ID
 export const useSubmissionById = (submissionId: string | null | undefined) => {
   return useQuery({
     queryKey: ['submission', submissionId],
@@ -113,7 +108,6 @@ export const useSubmissionById = (submissionId: string | null | undefined) => {
   });
 };
 
-// Hook for analyzing a submission
 export const useAnalyzeSubmission = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -38,7 +38,6 @@ interface VerifyOtpRequest {
   otp: string;
 }
 
-// Hook for sending verification code
 export const useLoginOtp = () => {
   return useMutation({
     mutationFn: async (data: LoginOtpRequest): Promise<LoginOtpResponse> => {
@@ -51,7 +50,6 @@ export const useLoginOtp = () => {
   });
 };
 
-// Hook for verifying phone with code
 export const useVerifyOtp = () => {
   return useMutation({
     mutationFn: async (data: VerifyOtpRequest): Promise<VerifyOtpResponse> => {
@@ -59,11 +57,6 @@ export const useVerifyOtp = () => {
       return response;
     },
     onSuccess: async (data: VerifyOtpResponse | any) => {
-      // Robust token persistence for multiple backend shapes
-      // Supported shapes:
-      // 1) data.data.tokens.{accessToken,refreshToken}
-      // 2) data.data.{accessToken,refreshToken}
-      // 3) data.{accessToken,refreshToken}
       const tokens = data?.data?.tokens as
         | { accessToken?: string; refreshToken?: string }
         | { access_token?: string; refresh_token?: string }
@@ -86,18 +79,14 @@ export const useVerifyOtp = () => {
         data?.refresh_token;
 
       if (accessToken) {
-        // Cookies (used by tokenService/AuthProvider)
         cookies.set('m_at', accessToken);
         if (refreshToken) cookies.set('m_rt', refreshToken);
 
-        // LocalStorage (used by axios interceptor)
         localStorage.setItem('access_token', accessToken);
         if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
 
-        // Apply header immediately
         setSession(accessToken);
 
-        // User profile: store provided or fetch from /auth/me
         const user = data?.data?.user
           ? data.data.user
           : await authAPI
@@ -113,11 +102,9 @@ export const useVerifyOtp = () => {
   });
 };
 
-// Hook for Google sign-in (placeholder for future implementation)
 export const useGoogleSignIn = () => {
   return useMutation({
     mutationFn: async (): Promise<any> => {
-      // This would be replaced with actual Google OAuth implementation
       return new Promise(resolve => {
         setTimeout(() => {
           resolve({
@@ -154,7 +141,6 @@ export const useGoogleSignIn = () => {
   });
 };
 
-// Hook for demo login (placeholder)
 export const useDemoLogin = () => {
   return useMutation({
     mutationFn: async (): Promise<any> => {
