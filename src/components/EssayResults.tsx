@@ -17,7 +17,6 @@ import {
   Link,
   PenTool,
   BookMarked,
-  FileText,
   DownloadIcon,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -62,6 +61,75 @@ interface EssayResultsProps {
   setOptions: (options: AnalysisOptions) => void;
 }
 
+// Color palette for sentence highlighting - each position gets a unique color
+const SENTENCE_COLORS = [
+  'bg-blue-200 text-blue-900 border-2 border-blue-400 shadow-sm',
+  'bg-green-200 text-green-900 border-2 border-green-400 shadow-sm',
+  'bg-yellow-200 text-yellow-900 border-2 border-yellow-400 shadow-sm',
+  'bg-purple-200 text-purple-900 border-2 border-purple-400 shadow-sm',
+  'bg-pink-200 text-pink-900 border-2 border-pink-400 shadow-sm',
+  'bg-indigo-200 text-indigo-900 border-2 border-indigo-400 shadow-sm',
+  'bg-orange-200 text-orange-900 border-2 border-orange-400 shadow-sm',
+  'bg-teal-200 text-teal-900 border-2 border-teal-400 shadow-sm',
+];
+
+// Function to format improved text and remove generic responses
+const formatImprovedText = (text: string) => {
+  if (!text) return '';
+  
+  // Remove generic responses that don't provide actual content
+  const genericResponses = [
+    'This introduction demonstrates exceptional clarity and sophistication in presenting the argument.',
+    'This paragraph showcases advanced critical thinking and sophisticated argumentation with excellent examples.',
+    'This paragraph demonstrates mastery of complex ideas with flawless expression and coherence.',
+    'This conclusion provides exceptional synthesis and leaves a lasting impression.'
+  ];
+  
+  // If the text is a generic response, return a placeholder
+  if (genericResponses.includes(text.trim())) {
+    return 'Content will be generated here...';
+  }
+  
+  return text;
+};
+
+// IELTS criteria definitions
+const getIELTSCriteria = (band: number) => {
+  const criteria = {
+    7: {
+      taskAchievement:
+        'Addresses all parts of the task with clear positions and relevant examples. Ideas are developed and supported, though some may lack full development.',
+      coherenceCohesion:
+        'Logically organizes information with clear progression. Uses cohesive devices effectively, though sometimes mechanically. Has clear central topic within most paragraphs.',
+      lexicalResource:
+        'Uses sufficient range of vocabulary with some natural use of less common items. Shows awareness of style and collocation with occasional inappropriacies. Makes some errors in word choice but meaning remains clear.',
+      grammaticalRange:
+        'Uses variety of complex structures with good control and flexibility. Produces frequent error-free sentences with only occasional errors or inappropriacies.',
+    },
+    8: {
+      taskAchievement:
+        'Sufficiently addresses all parts of the task with well-developed response. Presents well-developed position with relevant, extended and supported ideas.',
+      coherenceCohesion:
+        'Sequences information logically with wide range of cohesive devices used naturally and appropriately. Uses paragraphing sufficiently and appropriately.',
+      lexicalResource:
+        'Uses wide range of vocabulary naturally and flexibly to convey precise meanings. Uses less common lexical items with awareness of style. Produces rare errors in word choice and collocation.',
+      grammaticalRange:
+        'Uses wide range of structures with natural flexibility and accuracy. Majority of sentences are error-free with only very occasional inappropriacies.',
+    },
+    9: {
+      taskAchievement:
+        'Fully addresses all parts of the task with fully developed position. Presents relevant, fully extended and well-supported ideas throughout.',
+      coherenceCohesion:
+        'Uses cohesion in such a way that it attracts no attention. Skillfully manages paragraphing with seamless progression throughout.',
+      lexicalResource:
+        'Uses wide range of vocabulary with very natural and sophisticated control. Uses precise and rare lexical items with complete naturalness and accuracy.',
+      grammaticalRange:
+        "Uses wide range of structures with full flexibility and accuracy. Rare minor errors occur only as 'slips' in otherwise perfect language.",
+    },
+  };
+  return criteria[band as keyof typeof criteria];
+};
+
 export const EssayResults = ({
   latestSubmission,
   bandVersions,
@@ -76,35 +144,6 @@ export const EssayResults = ({
 }: EssayResultsProps) => {
   const { toast } = useToast();
 
-  // Function to format improved text and remove generic responses
-  const formatImprovedText = (text: string) => {
-    if (!text) return '';
-    
-    // Remove generic responses that don't provide actual content
-    const genericResponses = [
-      'This introduction demonstrates exceptional clarity and sophistication in presenting the argument.',
-      'This paragraph showcases advanced critical thinking and sophisticated argumentation with excellent examples.',
-      'This paragraph demonstrates mastery of complex ideas with flawless expression and coherence.',
-      'This conclusion provides exceptional synthesis and leaves a lasting impression.'
-    ];
-    
-    // If the text is a generic response, return a placeholder
-    if (genericResponses.includes(text.trim())) {
-      return 'Content will be generated here...';
-    }
-    
-    return text;
-  };
-
-  const sentenceColors = [
-    'bg-blue-200 text-blue-900 border-2 border-blue-400 shadow-sm',
-    'bg-green-200 text-green-900 border-2 border-green-400 shadow-sm',
-    'bg-yellow-200 text-yellow-900 border-2 border-yellow-400 shadow-sm',
-    'bg-purple-200 text-purple-900 border-2 border-purple-400 shadow-sm',
-    'bg-pink-200 text-pink-900 border-2 border-pink-400 shadow-sm',
-    'bg-indigo-200 text-indigo-900 border-2 border-indigo-400 shadow-sm',
-  ];
-
   const originalSplitted = useMemo(() => {
     if (!latestSubmission?.body) return [];
     return latestSubmission.body.split('\n').filter(Boolean);
@@ -115,42 +154,6 @@ export const EssayResults = ({
   }, [bandVersions, selectedBand]);
 
   if (!latestSubmission) return null;
-
-  const getIELTSCriteria = (band: number) => {
-    const criteria = {
-      7: {
-        taskAchievement:
-          'Addresses all parts of the task with clear positions and relevant examples. Ideas are developed and supported, though some may lack full development.',
-        coherenceCohesion:
-          'Logically organizes information with clear progression. Uses cohesive devices effectively, though sometimes mechanically. Has clear central topic within most paragraphs.',
-        lexicalResource:
-          'Uses sufficient range of vocabulary with some natural use of less common items. Shows awareness of style and collocation with occasional inappropriacies. Makes some errors in word choice but meaning remains clear.',
-        grammaticalRange:
-          'Uses variety of complex structures with good control and flexibility. Produces frequent error-free sentences with only occasional errors or inappropriacies.',
-      },
-      8: {
-        taskAchievement:
-          'Sufficiently addresses all parts of the task with well-developed response. Presents well-developed position with relevant, extended and supported ideas.',
-        coherenceCohesion:
-          'Sequences information logically with wide range of cohesive devices used naturally and appropriately. Uses paragraphing sufficiently and appropriately.',
-        lexicalResource:
-          'Uses wide range of vocabulary naturally and flexibly to convey precise meanings. Uses less common lexical items with awareness of style. Produces rare errors in word choice and collocation.',
-        grammaticalRange:
-          'Uses wide range of structures with natural flexibility and accuracy. Majority of sentences are error-free with only very occasional inappropriacies.',
-      },
-      9: {
-        taskAchievement:
-          'Fully addresses all parts of the task with fully developed position. Presents relevant, fully extended and well-supported ideas throughout.',
-        coherenceCohesion:
-          'Uses cohesion in such a way that it attracts no attention. Skillfully manages paragraphing with seamless progression throughout.',
-        lexicalResource:
-          'Uses wide range of vocabulary with very natural and sophisticated control. Uses precise and rare lexical items with complete naturalness and accuracy.',
-        grammaticalRange:
-          "Uses wide range of structures with full flexibility and accuracy. Rare minor errors occur only as 'slips' in otherwise perfect language.",
-      },
-    };
-    return criteria[band as keyof typeof criteria];
-  };
 
   const generatePDF = () => {
     const selectedVersion = bandVersions.find(v => v.band === selectedBand);

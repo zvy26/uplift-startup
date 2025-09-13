@@ -203,6 +203,7 @@ export const EssayAnalyzerWrapper = ({
         conclusion: string;
       }
     ): ParagraphMap[] => {
+      // Color palette for sentence highlighting - each position gets a unique color
       const sentenceColors = [
         'bg-blue-100 text-blue-800 border-blue-200',
         'bg-green-100 text-green-800 border-green-200',
@@ -210,6 +211,8 @@ export const EssayAnalyzerWrapper = ({
         'bg-purple-100 text-purple-800 border-purple-200',
         'bg-pink-100 text-pink-800 border-pink-200',
         'bg-indigo-100 text-indigo-800 border-indigo-200',
+        'bg-orange-100 text-orange-800 border-orange-200',
+        'bg-teal-100 text-teal-800 border-teal-200',
       ];
 
       const originalParagraphs = splitIntoParagraphs(originalText);

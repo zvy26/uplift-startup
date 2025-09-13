@@ -1,5 +1,5 @@
-import React, { useCallback, memo } from 'react';
-import { getSentenceColors, getActiveSentenceColor } from '@/lib/sentenceUtils';
+import React, { useCallback, memo, useEffect, useState } from 'react';
+import { getSentenceColors, getActiveSentenceColor, getHighlightColor } from '@/lib/sentenceUtils';
 
 interface SentenceWrapperProps {
   sentence: {
@@ -14,6 +14,15 @@ interface SentenceWrapperProps {
   className?: string;
 }
 
+// Global state for cross-panel highlighting
+let globalHoveredDataId: string | null = null;
+const hoverListeners: Set<(dataId: string | null) => void> = new Set();
+
+const setGlobalHoveredDataId = (dataId: string | null) => {
+  globalHoveredDataId = dataId;
+  hoverListeners.forEach(listener => listener(dataId));
+};
+
 export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
   sentence,
   dataId,
@@ -24,28 +33,33 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
 }) => {
   const baseColors = getSentenceColors(sentence.index);
   const activeColors = getActiveSentenceColor(sentence.index);
+  const [isGloballyHovered, setIsGloballyHovered] = useState(false);
+  
+  // Listen for global hover changes
+  useEffect(() => {
+    const listener = (hoveredDataId: string | null) => {
+      setIsGloballyHovered(hoveredDataId === dataId);
+    };
+    
+    hoverListeners.add(listener);
+    
+    // Set initial state
+    setIsGloballyHovered(globalHoveredDataId === dataId);
+    
+    return () => {
+      hoverListeners.delete(listener);
+    };
+  }, [dataId]);
   
   const handleMouseEnter = useCallback(() => {
-    // Use requestAnimationFrame for better performance
-    requestAnimationFrame(() => {
-      const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
-      elements.forEach(el => {
-        el.classList.add('sentence-highlighted');
-      });
-    });
+    setGlobalHoveredDataId(dataId);
     onHover(sentence.id);
   }, [dataId, onHover, sentence.id]);
   
   const handleMouseLeave = useCallback(() => {
-    // Use requestAnimationFrame for better performance
-    requestAnimationFrame(() => {
-      const elements = document.querySelectorAll(`[data-sentence-id="${dataId}"]`);
-      elements.forEach(el => {
-        el.classList.remove('sentence-highlighted');
-      });
-    });
+    setGlobalHoveredDataId(null);
     onHover(null);
-  }, [dataId, onHover]);
+  }, [onHover]);
   
   const handleFocus = useCallback(() => {
     onFocus(sentence.id);
@@ -64,12 +78,17 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
     }
   }, [handleMouseEnter, handleMouseLeave]);
   
+  // Determine the current styling
+  const currentColors = isGloballyHovered 
+    ? getHighlightColor(sentence.index)
+    : (isActive ? activeColors : baseColors);
+  
   return (
     <span
       data-sentence-id={dataId}
       className={`
         inline-block px-2 py-1 rounded-md transition-all duration-300 cursor-pointer
-        ${isActive ? activeColors : baseColors}
+        ${currentColors}
         ${className}
       `}
       onMouseEnter={handleMouseEnter}

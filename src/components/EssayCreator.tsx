@@ -188,20 +188,6 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
     } catch (error) {
       console.error('Error analyzing essay:', error);
       
-      // Log more detailed error information
-      if (error instanceof Error) {
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-      }
-      
-      // Check if it's an Axios error
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as any;
-        console.error('Axios error response:', axiosError.response?.data);
-        console.error('Axios error status:', axiosError.response?.status);
-        console.error('Axios error headers:', axiosError.response?.headers);
-      }
-      
       toast.error('Failed to analyze essay. Please try again.');
     }
   };

@@ -2,14 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Cross-panel sentence highlighting */
+/* Cross-panel sentence highlighting - colors are applied dynamically via JavaScript */
 .sentence-highlighted {
-  @apply bg-blue-200 border border-blue-400 text-blue-900 shadow-md;
-}
-
-/* Ensure all highlighted sentences use the same color */
-.sentence-highlighted[data-sentence-id] {
-  @apply bg-blue-200 border border-blue-400 text-blue-900 shadow-md;
+  /* Base highlight styles - specific colors are applied via className manipulation */
+  @apply shadow-md transition-all duration-200;
 }
 
 /* OTP Input animations */

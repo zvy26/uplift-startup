@@ -32,9 +32,17 @@ export const SentenceText: React.FC<SentenceTextProps> = memo(({
       {sentences.map((sentence, index) => {
         // Create a unique data-id that will be the same for corresponding sentences
         // Format: paragraphType-sentenceIndex (e.g., "intro-0", "body1-1", "conclusion-0")
-        const paragraphType = paragraphId.includes('intro') ? 'intro' :
-                             paragraphId.includes('conclusion') ? 'conclusion' :
-                             paragraphId.includes('body') ? paragraphId.match(/body-(\d+)/)?.[1] ? `body${paragraphId.match(/body-(\d+)/)?.[1]}` : 'body' : 'unknown';
+        let paragraphType = '';
+        if (paragraphId.includes('intro')) {
+          paragraphType = 'intro';
+        } else if (paragraphId.includes('conclusion')) {
+          paragraphType = 'conclusion';
+        } else if (paragraphId.includes('body')) {
+          const bodyMatch = paragraphId.match(/body-(\d+)/);
+          paragraphType = bodyMatch ? `body${bodyMatch[1]}` : 'body';
+        } else {
+          paragraphType = 'unknown';
+        }
         
         const dataId = `${paragraphType}-${sentence.index}`;
         

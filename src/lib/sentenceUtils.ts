@@ -45,6 +45,15 @@ export const parseSentences = (text: string): Sentence[] => {
     });
   }
   
+  // If no sentences were found (no punctuation), treat the entire text as one sentence
+  if (sentences.length === 0 && text.trim()) {
+    sentences.push({
+      id: 'sentence-0',
+      text: text.trim(),
+      index: 0
+    });
+  }
+  
   return sentences;
 };
 
@@ -119,37 +128,75 @@ const extractSentenceIndex = (sentenceId: string): number => {
 };
 
 /**
- * Generate sentence colors for highlighting
+ * Color palette for sentence highlighting
+ * Each sentence position gets a unique color
+ */
+const SENTENCE_COLORS = [
+  {
+    base: 'bg-gray-50 hover:bg-blue-100 border border-gray-200 text-gray-700',
+    active: 'bg-blue-100 border border-blue-300 text-blue-900',
+    highlight: 'bg-blue-200 border border-blue-400 text-blue-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-green-100 border border-gray-200 text-gray-700',
+    active: 'bg-green-100 border border-green-300 text-green-900',
+    highlight: 'bg-green-200 border border-green-400 text-green-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-yellow-100 border border-gray-200 text-gray-700',
+    active: 'bg-yellow-100 border border-yellow-300 text-yellow-900',
+    highlight: 'bg-yellow-200 border border-yellow-400 text-yellow-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-purple-100 border border-gray-200 text-gray-700',
+    active: 'bg-purple-100 border border-purple-300 text-purple-900',
+    highlight: 'bg-purple-200 border border-purple-400 text-purple-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-pink-100 border border-gray-200 text-gray-700',
+    active: 'bg-pink-100 border border-pink-300 text-pink-900',
+    highlight: 'bg-pink-200 border border-pink-400 text-pink-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-indigo-100 border border-gray-200 text-gray-700',
+    active: 'bg-indigo-100 border border-indigo-300 text-indigo-900',
+    highlight: 'bg-indigo-200 border border-indigo-400 text-indigo-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-orange-100 border border-gray-200 text-gray-700',
+    active: 'bg-orange-100 border border-orange-300 text-orange-900',
+    highlight: 'bg-orange-200 border border-orange-400 text-orange-900 shadow-md'
+  },
+  {
+    base: 'bg-gray-50 hover:bg-teal-100 border border-gray-200 text-gray-700',
+    active: 'bg-teal-100 border border-teal-300 text-teal-900',
+    highlight: 'bg-teal-200 border border-teal-400 text-teal-900 shadow-md'
+  }
+];
+
+/**
+ * Generate sentence colors for highlighting based on sentence position
+ * Each sentence position gets a unique color that matches across original and improved versions
  */
 export const getSentenceColors = (index: number): string => {
-  const colors = [
-    'bg-gray-50 hover:bg-blue-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-green-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-yellow-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-purple-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-pink-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-indigo-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-orange-100 border border-gray-200 text-gray-700',
-    'bg-gray-50 hover:bg-teal-100 border border-gray-200 text-gray-700',
-  ];
-  
-  return colors[index % colors.length];
+  const colorSet = SENTENCE_COLORS[index % SENTENCE_COLORS.length];
+  return colorSet.base;
 };
 
 /**
- * Get highlight color for active sentence
+ * Get highlight color for active sentence based on sentence position
+ * Each sentence position gets a unique active color
  */
 export const getActiveSentenceColor = (index: number): string => {
-  const colors = [
-    'bg-blue-100 border border-blue-300 text-blue-900',
-    'bg-green-100 border border-green-300 text-green-900',
-    'bg-yellow-100 border border-yellow-300 text-yellow-900',
-    'bg-purple-100 border border-purple-300 text-purple-900',
-    'bg-pink-100 border border-pink-300 text-pink-900',
-    'bg-indigo-100 border border-indigo-300 text-indigo-900',
-    'bg-orange-100 border border-orange-300 text-orange-900',
-    'bg-teal-100 border border-teal-300 text-teal-900',
-  ];
-  
-  return colors[index % colors.length];
+  const colorSet = SENTENCE_COLORS[index % SENTENCE_COLORS.length];
+  return colorSet.active;
+};
+
+/**
+ * Get highlight color for cross-panel highlighting based on sentence position
+ * This is used when hovering over a sentence to highlight corresponding sentences
+ */
+export const getHighlightColor = (index: number): string => {
+  const colorSet = SENTENCE_COLORS[index % SENTENCE_COLORS.length];
+  return colorSet.highlight;
 };
