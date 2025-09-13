@@ -12,6 +12,20 @@
   @apply bg-blue-200 border border-blue-400 text-blue-900 shadow-md;
 }
 
+/* OTP Input animations */
+@keyframes caret-blink {
+  0%, 70%, 100% {
+    opacity: 1;
+  }
+  20%, 50% {
+    opacity: 0;
+  }
+}
+
+.animate-caret-blink {
+  animation: caret-blink 1s infinite;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

@@ -370,7 +370,7 @@ export const EssayAnalyzerWrapper = ({
   // Show loading state when fetching specific submission (only for URL-based submissions)
   if (isLoadingSubmission && submissionId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
+      <div className="flex flex-col items-center justify-center text-center space-y-4">
         <div className="p-4 bg-accent/10 rounded-full">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -395,7 +395,7 @@ export const EssayAnalyzerWrapper = ({
               Our AI is analyzing your essay and generating improved versions.
             </p>
             <p className="mb-4">This may take a few moments.</p>
-            <div className="bg-accent/20 p-4 rounded-lg border-l-4 border-primary w-[600px]">
+            <div className="bg-accent/20 p-4 rounded-lg border-l-4 border-primary w-full md:w-[600px]">
               <p className="text-xl font-medium text-primary mb-2 text-center">
                 💡 IELTS Writing Tip:
               </p>

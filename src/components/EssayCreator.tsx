@@ -36,13 +36,12 @@ interface EssayCreatorProps {
 export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }: EssayCreatorProps) => {
   const navigate = useNavigate();
   const { data } = useGetTrial();
+  const { user, authenticated } = useAuthContext();
   const {
     data: topics,
     isLoading: topicsLoading,
     error: topicsError,
   } = useTopics();
-
-  const { user, authenticated } = useAuthContext();
 
   const hasPaidPlan = data?.hasPaidPlan || false;
   const freeTrialCount = data?.freeTrialCount || 0;
@@ -207,6 +206,13 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
     }
   };
 
+  const handleBandButtonClick = (band: number) => {
+    if (!authenticated) {
+      navigate(paths.auth.jwt.login);
+    }
+    // If authenticated, the button functionality can be extended later
+  };
+
   const handleGetPremium = () => {
     navigate(paths.pricing);
   };
@@ -232,14 +238,14 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Essay Topic</h3>
 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <Select
                     value={topicSource}
                     onValueChange={(value: 'generated' | 'custom') =>
                       setTopicSource(value)
                     }
                   >
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-full sm:w-48">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -254,7 +260,7 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
                     <Button
                       variant="outline"
                       onClick={generateRandomTopic}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 w-full sm:w-auto"
                     >
                       <Shuffle className="h-4 w-4" />
                       Generate Topic
@@ -324,24 +330,24 @@ export const EssayCreator = ({ isAnalyzing, onAnalyzeEssay, onStartNewAnalysis }
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-green-100 text-green-800 border-green-200"
-                  disabled={true}
+                  className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200"
+                  onClick={() => handleBandButtonClick(7)}
                 >
                   Band 7
                 </Button>
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-blue-100 text-blue-800 border-blue-200"
-                  disabled={true}
+                  className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200"
+                  onClick={() => handleBandButtonClick(8)}
                 >
                   Band 8
                 </Button>
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-purple-100 text-purple-800 border-purple-200"
-                  disabled={true}
+                  className="bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200"
+                  onClick={() => handleBandButtonClick(9)}
                 >
                   Band 9
                 </Button>
