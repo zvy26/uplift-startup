@@ -1,5 +1,6 @@
 import React, { useCallback, memo, useEffect, useState } from 'react';
 import { getSentenceColors, getActiveSentenceColor, getHighlightColor } from '@/lib/sentenceUtils';
+import { SuggestionHighlighter } from './SuggestionHighlighter';
 
 interface SentenceWrapperProps {
   sentence: {
@@ -12,6 +13,9 @@ interface SentenceWrapperProps {
   onHover: (sentenceId: string | null) => void;
   onFocus: (sentenceId: string | null) => void;
   className?: string;
+  mistakes?: string[];
+  suggestions?: string[];
+  showErrors?: boolean;
 }
 
 let globalHoveredDataId: string | null = null;
@@ -28,7 +32,10 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
   isActive,
   onHover,
   onFocus,
-  className = ''
+  className = '',
+  mistakes = [],
+  suggestions = [],
+  showErrors = false
 }) => {
   const baseColors = getSentenceColors(sentence.index);
   const activeColors = getActiveSentenceColor(sentence.index);
@@ -97,7 +104,15 @@ export const SentenceWrapper: React.FC<SentenceWrapperProps> = memo(({
       aria-label={`Sentence ${sentence.index + 1}: ${sentence.text.substring(0, 50)}${sentence.text.length > 50 ? '...' : ''}`}
       aria-describedby={`sentence-${sentence.id}-description`}
     >
-      {sentence.text}
+      {showErrors && (mistakes.length > 0 || suggestions.length > 0) ? (
+        <SuggestionHighlighter
+          text={sentence.text}
+          mistakes={mistakes}
+          suggestions={suggestions}
+        />
+      ) : (
+        sentence.text
+      )}
     </span>
   );
 });

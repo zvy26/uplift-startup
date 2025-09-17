@@ -238,6 +238,9 @@ export const EssayResults = ({
                           activeSentenceId={hoveredSentence}
                           onSentenceHover={setHoveredSentence}
                           onSentenceFocus={setHoveredSentence}
+                          mistakes={latestSubmission?.aiFeedback?.mistakes || []}
+                          suggestions={latestSubmission?.aiFeedback?.suggestions || []}
+                          showErrors={true}
                         />
                       </div>
                     </div>
@@ -278,6 +281,9 @@ export const EssayResults = ({
                               activeSentenceId={hoveredSentence}
                               onSentenceHover={setHoveredSentence}
                               onSentenceFocus={setHoveredSentence}
+                              mistakes={latestSubmission?.aiFeedback?.mistakes || []}
+                              suggestions={latestSubmission?.aiFeedback?.suggestions || []}
+                              showErrors={true}
                             />
                           </div>
                         </div>
@@ -303,6 +309,9 @@ export const EssayResults = ({
                               activeSentenceId={hoveredSentence}
                               onSentenceHover={setHoveredSentence}
                               onSentenceFocus={setHoveredSentence}
+                              mistakes={latestSubmission?.aiFeedback?.mistakes || []}
+                              suggestions={latestSubmission?.aiFeedback?.suggestions || []}
+                              showErrors={true}
                             />
                           </div>
                         </div>
@@ -365,41 +374,36 @@ export const EssayResults = ({
                 );
               })}
             </div>
-            <div className="flex flex-col gap-4 mt-4">
-              {latestSubmission?.aiFeedback && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Suggestions</h3>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {latestSubmission.aiFeedback.suggestions.map(
-                        (mistake, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <AlertCircle className="h-3 w-3 mt-0.5 text-accent flex-shrink-0" />
-                            {mistake}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
+            
+            {/* Interactive Feedback Guide */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-semibold text-gray-800">Interactive Feedback</span>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 bg-red-100 border border-red-400 rounded"></span>
+                  <span className="text-gray-700">Vocabulary & Grammar</span>
                 </div>
-              )}
-              {latestSubmission?.aiFeedback && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Mistakes</h3>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {latestSubmission.aiFeedback.mistakes.map(
-                        (mistake, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <AlertCircle className="h-3 w-3 mt-0.5 text-destructive flex-shrink-0" />
-                            {mistake}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 bg-red-100 border border-red-400 rounded"></span>
+                  <span className="text-gray-700">Coherence Issues</span>
                 </div>
-              )}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 bg-purple-200 border border-purple-500 rounded"></span>
+                  <span className="text-gray-700">Positive Tips</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-3 h-3 bg-blue-200 border border-blue-500 rounded"></span>
+                  <span className="text-gray-700">Good Coherence</span>
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-600">
+                Hover over highlighted text to see detailed feedback and suggestions.
+              </p>
             </div>
           </CardContent>
         </Card>
