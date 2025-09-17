@@ -8,8 +8,12 @@ const REFRESH_TOKEN_STORAGE_KEY = "m_rt";
 
 export const tokenService = {
   getTokens() {
-    const accessToken = cookies.get(ACCESS_TOKEN_STORAGE_KEY);
-    const refreshToken = cookies.get(REFRESH_TOKEN_STORAGE_KEY);
+    // Check both cookies and localStorage for tokens
+    const cookieToken = cookies.get(ACCESS_TOKEN_STORAGE_KEY);
+    const localStorageToken = localStorage.getItem("access_token");
+    
+    const accessToken = cookieToken || localStorageToken;
+    const refreshToken = cookies.get(REFRESH_TOKEN_STORAGE_KEY) || localStorage.getItem("refresh_token");
 
     return {
       accessToken,

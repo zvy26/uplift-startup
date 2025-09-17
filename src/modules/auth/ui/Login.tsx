@@ -64,7 +64,6 @@ import {
   useLoginOtp,
   useVerifyOtp,
   useGoogleSignIn,
-  useDemoLogin,
 } from '@/services/authMutations';
 
 // Error type for API responses
@@ -121,14 +120,12 @@ export const Login = ({ onLoginSuccess, redirectTo = '/ielts-writing' }: LoginPa
   const loginOtpMutation = useLoginOtp();
   const verifyOtpMutation = useVerifyOtp();
   const googleSignInMutation = useGoogleSignIn();
-  const demoLoginMutation = useDemoLogin();
 
   // Loading states
   const isLoading =
     loginOtpMutation.isPending ||
     verifyOtpMutation.isPending ||
-    googleSignInMutation.isPending ||
-    demoLoginMutation.isPending;
+    googleSignInMutation.isPending;
 
   const phoneForm = useForm<PhoneFormData>({
     resolver: zodResolver(phoneSchema),

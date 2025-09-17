@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import cookies from 'js-cookie';
 
 import { paths } from '@/routes/paths';
 import http from '@/services/api';
@@ -71,8 +72,14 @@ export const setSession = (access_token: string | null) => {
   if (access_token) {
     http.defaults.headers.common.Authorization = `Bearer ${access_token}`;
   } else {
+    // Clear localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('userData');
+    
+    // Clear cookies
+    cookies.remove('m_at');
+    cookies.remove('m_rt');
 
     delete http.defaults.headers.common.Authorization;
   }

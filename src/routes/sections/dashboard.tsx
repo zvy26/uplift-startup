@@ -11,7 +11,11 @@ export const dashboard: RouteObject[] = [
     children: [
       {
         path: '',
-        element: <Index />,
+        element: (
+          <AuthGuard>
+            <Index />
+          </AuthGuard>
+        ),
       },
     ],
   },
@@ -20,7 +24,11 @@ export const dashboard: RouteObject[] = [
     children: [
       {
         path: '',
-        element: <IeltsWriting />,
+        element: (
+          <AuthGuard>
+            <IeltsWriting />
+          </AuthGuard>
+        ),
       },
     ],
   },

@@ -16,8 +16,8 @@ export const Router = () => {
 
   const routes = [
     ...exposed,
-    ...dashboard, // Allow access to main page for all users
-    ...(unauthenticated ? authRoutes : []), // Only show auth routes if authenticated
+    ...dashboard, // Protected routes - require authentication
+    ...(unauthenticated ? authRoutes : []), // Only show auth routes if NOT authenticated
     ...notFound,
   ];
 
